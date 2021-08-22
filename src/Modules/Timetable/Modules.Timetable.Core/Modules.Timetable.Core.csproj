@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared\Shared.Core\Shared.Core.csproj" />
+      <ProjectReference Include="..\..\..\Shared\Shared.DTO\Shared.DTO.csproj" />
+    </ItemGroup>
+
+</Project>
