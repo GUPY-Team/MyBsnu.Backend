@@ -34,13 +34,7 @@ namespace Modules.Identity.Core.Features.User
 
             if (!result.Succeeded)
             {
-                var error = result.Errors.First();
-                throw new IdentityException(
-                    "Unable to signup user",
-                    new Dictionary<string, string[]>
-                    {
-                        { error.Code, new[] { error.Description } }
-                    });
+                throw new IdentityException("Unable to signup user");
             }
         }
 

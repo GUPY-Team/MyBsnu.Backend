@@ -67,6 +67,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
         public async Task<List<ScheduleDto>> Handle(GetSchedulesQuery request, CancellationToken cancellationToken)
         {
             var schedules = await _dbContext.Schedules
+                .OrderByDescending(s => s.Year)
+                .ThenByDescending(s => s.HalfYear)
+                .ThenByDescending(s => s.Version)
                 .AsNoTracking()
                 .ProjectTo<ScheduleDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
