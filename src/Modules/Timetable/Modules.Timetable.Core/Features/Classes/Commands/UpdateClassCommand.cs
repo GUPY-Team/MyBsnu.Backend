@@ -7,10 +7,10 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
     public class UpdateClassCommand : IRequest<ClassDto>
     {
         public int Id { get; init; }
-        public int Format { get; init; }
-        public int Type { get; init; }
-        public int DayOfWeek { get; init; }
-        public int WeekType { get; init; }
+        public string Format { get; init; }
+        public string Type { get; init; }
+        public string WeekDay { get; init; }
+        public string WeekType { get; init; }
         public TimeDto StartTime { get; init; }
         public TimeDto EndTime { get; init; }
         public int CourseId { get; init; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Ardalis.SmartEnum;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Shared.Core.Domain;
@@ -44,6 +45,7 @@ namespace Shared.Infrastructure.Middleware
                 EntityNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.NotFound },
                 EntityNotValidException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
                 DomainException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
+                SmartEnumNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
                 _ => new ApiError { Message = "Internal server error", Status = (int) HttpStatusCode.InternalServerError }
             };
         }

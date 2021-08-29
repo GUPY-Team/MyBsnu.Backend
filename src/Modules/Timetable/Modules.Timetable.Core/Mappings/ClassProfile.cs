@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Modules.Timetable.Core.Entities;
+using Modules.Timetable.Core.Enums;
 using Modules.Timetable.Core.Features.Classes.Commands;
 using Shared.DTO.Schedule;
 
@@ -9,8 +10,20 @@ namespace Modules.Timetable.Core.Mappings
     {
         public ClassProfile()
         {
-            CreateMap<CreateClassCommand, Class>();
-            CreateMap<UpdateClassCommand, Class>();
+            CreateMap<CreateClassCommand, Class>().ConstructUsing(c => new Class
+            {
+                Format = EducationFormat.FromName(c.Format, true),
+                Type = ClassType.FromName(c.Type, true),
+                WeekDay = WeekDay.FromName(c.WeekDay, true),
+                WeekType = WeekType.FromName(c.WeekType, true)
+            });
+            CreateMap<UpdateClassCommand, Class>().ConstructUsing(c => new Class
+            {
+                Format = EducationFormat.FromName(c.Format, true),
+                Type = ClassType.FromName(c.Type, true),
+                WeekDay = WeekDay.FromName(c.WeekDay, true),
+                WeekType = WeekType.FromName(c.WeekType, true)
+            });
             CreateMap<Class, ClassDto>().ConstructUsing(c => new ClassDto
             {
                 TeacherName = c.Teacher.FullName,

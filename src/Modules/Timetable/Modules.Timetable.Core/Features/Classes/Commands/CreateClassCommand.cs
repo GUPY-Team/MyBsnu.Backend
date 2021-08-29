@@ -6,10 +6,10 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
 {
     public class CreateClassCommand : IRequest<ClassDto>
     {
-        public int Format { get; init; }
-        public int Type { get; init; }
-        public int DayOfWeek { get; init; }
-        public int WeekType { get; init; }
+        public string Format { get; init; }
+        public string Type { get; init; }
+        public string WeekDay { get; init; }
+        public string WeekType { get; init; }
         public TimeDto StartTime { get; init; }
         public TimeDto EndTime { get; init; }
         public int CourseId { get; init; }
