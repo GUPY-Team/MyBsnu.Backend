@@ -6,6 +6,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
+using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
 
@@ -29,7 +30,7 @@ namespace Modules.Timetable.Core.Features.Teachers.Queries
             var teacher = await _dbContext.Teachers.FindAsync(request.Id);
             if (teacher == null)
             {
-                throw new EntityNotFoundException("Teacher not found");
+                throw new EntityNotFoundException(nameof(Teacher));
             }
 
             return _mapper.Map<TeacherDto>(teacher);

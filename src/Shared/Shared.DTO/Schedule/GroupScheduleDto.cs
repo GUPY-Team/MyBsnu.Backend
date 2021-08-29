@@ -6,7 +6,7 @@ namespace Shared.DTO.Schedule
     {
         public string GroupNumber { get; init; }
 
-        public string HalfYear { get; init; }
+        public string Semester { get; init; }
         public int Year { get; init; }
         public int Version { get; init; }
 

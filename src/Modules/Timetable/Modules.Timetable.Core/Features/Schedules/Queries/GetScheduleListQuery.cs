@@ -4,7 +4,7 @@ using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Schedules.Queries
 {
-    public class GetSchedulesQuery : IRequest<List<ScheduleDto>>
+    public class GetScheduleListQuery : IRequest<List<ScheduleDto>>
     {
     }
 }

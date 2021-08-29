@@ -6,6 +6,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
+using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
 
@@ -29,7 +30,7 @@ namespace Modules.Timetable.Core.Features.Audiences.Queries
             var audience = await _dbContext.Audiences.FindAsync(request.Id);
             if (audience == null)
             {
-                throw new EntityNotFoundException("Audience not found");
+                throw new EntityNotFoundException(nameof(Audience));
             }
 
             return _mapper.Map<AudienceDto>(audience);

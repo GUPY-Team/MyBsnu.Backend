@@ -38,7 +38,7 @@ namespace Modules.Timetable.Core.Features.Groups.Commands
             var group = await _dbContext.Groups.FindAsync(request.Id);
             if (group == null)
             {
-                throw new EntityNotFoundException("Group not found");
+                throw new EntityNotFoundException(nameof(Group));
             }
 
             _mapper.Map(request, group);
@@ -52,7 +52,7 @@ namespace Modules.Timetable.Core.Features.Groups.Commands
             var group = await _dbContext.Groups.FindAsync(request.Id);
             if (group == null)
             {
-                throw new EntityNotFoundException("Group not found");
+                throw new EntityNotFoundException(nameof(Group));
             }
 
             _dbContext.Groups.Remove(group);

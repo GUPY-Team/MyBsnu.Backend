@@ -4,6 +4,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
+using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
 
@@ -28,7 +29,7 @@ namespace Modules.Timetable.Core.Features.Classes.Queries
                 .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
             if (@class == null)
             {
-                throw new EntityNotFoundException("Class not found");
+                throw new EntityNotFoundException(nameof(Class));
             }
 
             return _mapper.Map<ClassDto>(@class);

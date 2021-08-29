@@ -40,7 +40,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             var @class = await _dbContext.Classes.FindAsync(request.Id);
             if (@class == null)
             {
-                throw new EntityNotFoundException("Class not found");
+                throw new EntityNotFoundException(nameof(Class));
             }
 
             _mapper.Map(request, @class);
@@ -55,7 +55,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             var @class = await _dbContext.Classes.FindAsync(request.Id);
             if (@class == null)
             {
-                throw new EntityNotFoundException("Class not found");
+                throw new EntityNotFoundException(nameof(Class));
             }
 
             _dbContext.Classes.Remove(@class);

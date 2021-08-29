@@ -27,31 +27,25 @@ namespace Shared.Infrastructure.Middleware
             {
                 _logger.LogError(exception.Message);
 
+                var apiError = ConvertToError(exception);
+
                 var response = context.Response;
                 response.ContentType = "application/json";
+                response.StatusCode = apiError.Status;
 
-                var apiError = new ApiError();
-                switch (exception)
-                {
-                    case EntityNotFoundException e:
-                        response.StatusCode = (int) HttpStatusCode.NotFound;
-                        apiError.Message = e.Message;
-                        apiError.Errors = e.Errors;
-                        break;
-                    case DomainException e:
-                        response.StatusCode = (int) HttpStatusCode.BadRequest;
-                        apiError.Message = e.Message;
-                        apiError.Errors = e.Errors;
-                        break;
-                    default:
-                        response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                        apiError.Message = "Internal server error";
-                        break;
-                }
-
-                apiError.Status = response.StatusCode;
                 await response.WriteAsJsonAsync(apiError);
             }
+        }
+
+        private ApiError ConvertToError(Exception exception)
+        {
+            return exception switch
+            {
+                EntityNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.NotFound },
+                EntityNotValidException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
+                DomainException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
+                _ => new ApiError { Message = "Internal server error", Status = (int) HttpStatusCode.InternalServerError }
+            };
         }
     }
 }

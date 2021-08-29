@@ -6,6 +6,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
+using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
 
@@ -29,7 +30,7 @@ namespace Modules.Timetable.Core.Features.Groups.Queries
             var group = await _dbContext.Groups.FindAsync(request.Id);
             if (group == null)
             {
-                throw new EntityNotFoundException("Group not found");
+                throw new EntityNotFoundException(nameof(Group));
             }
 
             return _mapper.Map<GroupDto>(group);

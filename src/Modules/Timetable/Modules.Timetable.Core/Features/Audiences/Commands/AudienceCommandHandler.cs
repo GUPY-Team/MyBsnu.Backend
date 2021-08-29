@@ -38,7 +38,7 @@ namespace Modules.Timetable.Core.Features.Audiences.Commands
             var audience = await _dbContext.Audiences.FindAsync(request.Id);
             if (audience == null)
             {
-                throw new EntityNotFoundException("Audience not found");
+                throw new EntityNotFoundException(nameof(Audience));
             }
 
             _mapper.Map(request, audience);
@@ -53,7 +53,7 @@ namespace Modules.Timetable.Core.Features.Audiences.Commands
             var audience = await _dbContext.Audiences.FindAsync(request.Id);
             if (audience == null)
             {
-                throw new EntityNotFoundException("Audience not found");
+                throw new EntityNotFoundException(nameof(Audience));
             }
 
             _dbContext.Audiences.Remove(audience);

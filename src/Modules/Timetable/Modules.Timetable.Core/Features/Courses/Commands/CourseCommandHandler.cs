@@ -38,7 +38,7 @@ namespace Modules.Timetable.Core.Features.Courses.Commands
             var course = await _dbContext.Courses.FindAsync(request.Id);
             if (course == null)
             {
-                throw new EntityNotFoundException("Course not found");
+                throw new EntityNotFoundException(nameof(Course));
             }
 
             _mapper.Map(request, course);
@@ -52,7 +52,7 @@ namespace Modules.Timetable.Core.Features.Courses.Commands
             var course = await _dbContext.Courses.FindAsync(request.Id);
             if (course == null)
             {
-                throw new EntityNotFoundException("Course not found");
+                throw new EntityNotFoundException(nameof(Course));
             }
 
             _dbContext.Courses.Remove(course);
