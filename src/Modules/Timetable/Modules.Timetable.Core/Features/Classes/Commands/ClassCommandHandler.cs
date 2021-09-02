@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
@@ -9,7 +10,7 @@ using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Classes.Commands
 {
-    public class ClassCommandHandler 
+    public class ClassCommandHandler
         : IRequestHandler<CreateClassCommand, ClassDto>,
             IRequestHandler<UpdateClassCommand, ClassDto>,
             IRequestHandler<DeleteClassCommand, Unit>
@@ -44,7 +45,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             }
 
             _mapper.Map(request, @class);
-            
+
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<ClassDto>(@class);
@@ -52,7 +53,9 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
 
         public async Task<Unit> Handle(DeleteClassCommand request, CancellationToken cancellationToken)
         {
-            var @class = await _dbContext.Classes.FindAsync(request.Id);
+            var @class = await _dbContext.Classes
+                .IgnoreAutoIncludes()
+                .SingleOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
             if (@class == null)
             {
                 throw new EntityNotFoundException(nameof(Class));

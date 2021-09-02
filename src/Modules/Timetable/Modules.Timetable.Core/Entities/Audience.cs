@@ -1,4 +1,5 @@
-﻿using Shared.Core.Domain;
+﻿using System.Collections.Generic;
+using Shared.Core.Domain;
 
 namespace Modules.Timetable.Core.Entities
 {
@@ -9,5 +10,7 @@ namespace Modules.Timetable.Core.Entities
         public int Room { get; set; }
 
         public string FullNumber => $"{Corps}-{Floor}{Room.ToString().PadLeft(2, '0')}";
+
+        public ICollection<Class> Classes { get; set; } = new List<Class>();
     }
 }

@@ -11,7 +11,7 @@ namespace Modules.Timetable.Core.Mappings
         {
             CreateMap<CreateAudienceCommand, Audience>();
             CreateMap<UpdateAudienceCommand, Audience>();
-            CreateMap<Audience, AudienceDto>();
+            CreateMap<Audience, AudienceDto>().ReverseMap();
         }
     }
 }

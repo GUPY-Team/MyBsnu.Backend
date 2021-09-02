@@ -11,7 +11,7 @@ namespace Modules.Timetable.Core.Mappings
         {
             CreateMap<CreateGroupCommand, Group>();
             CreateMap<UpdateGroupCommand, Group>();
-            CreateMap<Group, GroupDto>();
+            CreateMap<Group, GroupDto>().ReverseMap();
         }
     }
 }

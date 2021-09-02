@@ -11,7 +11,7 @@ namespace Modules.Timetable.Controllers
     public class ClassesController : ApiControllerBase
     {
         [HttpGet("{Id:min(1)}")]
-        public async Task<IActionResult> GetClass([FromRoute] GetClassByIdQuery query)
+        public async Task<ActionResult<ClassDto>> GetClass([FromRoute] GetClassByIdQuery query)
         {
             var result = await Mediator.Send(query);
             return Ok(result);
@@ -25,14 +25,14 @@ namespace Modules.Timetable.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateClass([FromBody] UpdateClassCommand command)
+        public async Task<ActionResult<ClassDto>> UpdateClass([FromBody] UpdateClassCommand command)
         {
             var result = await Mediator.Send(command);
             return Ok(result);
         }
 
         [HttpDelete("{id:min(1)}")]
-        public async Task<IActionResult> DeleteClass([FromRoute] DeleteClassCommand command)
+        public async Task<ActionResult> DeleteClass([FromRoute] DeleteClassCommand command)
         {
             await Mediator.Send(command);
             return NoContent();

@@ -14,7 +14,7 @@ using Shared.DTO.Schedule;
 namespace Modules.Timetable.Core.Features.Schedules.Queries
 {
     public class ScheduleCommandHandler
-        : IRequestHandler<GetLatestScheduleQuery, GroupScheduleDto>,
+        : IRequestHandler<GetLatestGroupScheduleQuery, GroupScheduleDto>,
             IRequestHandler<GetScheduleListQuery, List<ScheduleDto>>,
             IRequestHandler<GetScheduleByIdQuery, ScheduleDto>,
             IRequestHandler<GetGroupScheduleQuery, GroupScheduleDto>
@@ -28,7 +28,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             _mapper = mapper;
         }
 
-        public async Task<GroupScheduleDto> Handle(GetLatestScheduleQuery request, CancellationToken cancellationToken)
+        public async Task<GroupScheduleDto> Handle(GetLatestGroupScheduleQuery request, CancellationToken cancellationToken)
         {
             var group = await _dbContext.Groups.FindAsync(request.GroupId);
             if (group == null)
@@ -42,11 +42,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
             return new GroupScheduleDto
             {
-                GroupNumber = group.Number,
-                Version = schedule.Version,
-                Semester = schedule.Semester.Name,
                 Year = schedule.Year,
-                Classes = GroupClasses(schedule.Classes)
+                Semester = schedule.Semester.Name,
+                Classes = MapToClasses(schedule.Classes)
             };
         }
 
@@ -91,11 +89,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
             return new GroupScheduleDto
             {
-                GroupNumber = group.Number,
-                Version = schedule.Version,
-                Semester = schedule.Semester.Name,
                 Year = schedule.Year,
-                Classes = GroupClasses(schedule.Classes)
+                Semester = schedule.Semester.Name,
+                Classes = MapToClasses(schedule.Classes)
             };
         }
 
@@ -110,7 +106,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
                 );
         }
 
-        private Dictionary<string, ClassDto[]> GroupClasses(IEnumerable<Class> classes)
+        private Dictionary<string, ClassDto[]> MapToClasses(IEnumerable<Class> classes)
         {
             return classes.GroupBy(c => c.WeekDay)
                 .OrderBy(g => g.Key)

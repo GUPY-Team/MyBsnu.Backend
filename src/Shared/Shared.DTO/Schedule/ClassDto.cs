@@ -1,4 +1,7 @@
-﻿namespace Shared.DTO.Schedule
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+namespace Shared.DTO.Schedule
 {
     public record ClassDto
     {
@@ -12,10 +15,11 @@
         public string Duration { get; init; }
         public string CourseName { get; init; }
         public int CourseId { get; init; }
-        public string TeacherName { get; init; }
-        public int TeacherId { get; init; }
-        public string AudienceNumber { get; init; }
-        public int? AudienceId { get; init; }
+
         public int ScheduleId { get; init; }
+
+        public IEnumerable<TeacherDto> Teachers { get; init; } = new List<TeacherDto>();
+        public IEnumerable<AudienceDto> Audiences { get; init; } = new List<AudienceDto>();
+        public IEnumerable<Group> Groups { get; init; } = new List<Group>();
     }
 }

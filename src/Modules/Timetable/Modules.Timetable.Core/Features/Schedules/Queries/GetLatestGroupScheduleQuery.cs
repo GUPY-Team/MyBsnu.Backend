@@ -3,7 +3,7 @@ using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Schedules.Queries
 {
-    public class GetLatestScheduleQuery : IRequest<GroupScheduleDto>
+    public class GetLatestGroupScheduleQuery : IRequest<GroupScheduleDto>
     {
         public int GroupId { get; init; }
     }

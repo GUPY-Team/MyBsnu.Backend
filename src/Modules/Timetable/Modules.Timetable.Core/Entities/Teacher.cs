@@ -1,4 +1,5 @@
-﻿using Shared.Core.Domain;
+﻿using System.Collections.Generic;
+using Shared.Core.Domain;
 
 namespace Modules.Timetable.Core.Entities
 {
@@ -9,5 +10,7 @@ namespace Modules.Timetable.Core.Entities
         public string ThirdName { get; set; }
 
         public string FullName => $"{FirstName} {LastName} {LastName}";
+
+        public ICollection<Class> Classes { get; set; }
     }
 }

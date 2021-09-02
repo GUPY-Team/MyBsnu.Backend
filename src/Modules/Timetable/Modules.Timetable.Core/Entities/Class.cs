@@ -20,15 +20,11 @@ namespace Modules.Timetable.Core.Entities
         public Course Course { get; set; }
         public int CourseId { get; set; }
 
-        public Teacher Teacher { get; set; }
-        public int TeacherId { get; set; }
-
-        public Audience Audience { get; set; }
-        public int? AudienceId { get; set; }
-
         public Schedule Schedule { get; set; }
         public int ScheduleId { get; set; }
 
         public ICollection<Group> Groups { get; set; } = new List<Group>();
+        public ICollection<Audience> Audiences { get; set; } = new List<Audience>();
+        public ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
     }
 }

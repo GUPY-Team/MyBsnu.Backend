@@ -11,7 +11,7 @@ namespace Modules.Timetable.Core.Mappings
         {
             CreateMap<CreateTeacherCommand, Teacher>();
             CreateMap<UpdateTeacherCommand, Teacher>();
-            CreateMap<Teacher, TeacherDto>();
+            CreateMap<Teacher, TeacherDto>().ReverseMap();
         }
     }
 }

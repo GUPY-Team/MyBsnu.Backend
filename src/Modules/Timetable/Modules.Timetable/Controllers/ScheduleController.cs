@@ -23,19 +23,5 @@ namespace Modules.Timetable.Controllers
             var result = await Mediator.Send(query);
             return Ok(result);
         }
-
-        [HttpGet("latest")]
-        public async Task<ActionResult<GroupScheduleDto>> GetLatestSchedule([FromQuery] GetLatestScheduleQuery query)
-        {
-            var result = await Mediator.Send(query);
-            return Ok(result);
-        }
-
-        [HttpGet("{ScheduleId:min(1)}/groups/{GroupId:min(1)}")]
-        public async Task<ActionResult<GroupScheduleDto>> GetGroupSchedule([FromRoute] GetGroupScheduleQuery query)
-        {
-            var result = await Mediator.Send(query);
-            return Ok(result);
-        }
     }
 }
