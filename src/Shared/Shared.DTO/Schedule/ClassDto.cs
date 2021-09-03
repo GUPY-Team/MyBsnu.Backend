@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Shared.DTO.Schedule
 {
@@ -20,6 +19,6 @@ namespace Shared.DTO.Schedule
 
         public IEnumerable<TeacherDto> Teachers { get; init; } = new List<TeacherDto>();
         public IEnumerable<AudienceDto> Audiences { get; init; } = new List<AudienceDto>();
-        public IEnumerable<Group> Groups { get; init; } = new List<Group>();
+        public IEnumerable<GroupDto> Groups { get; init; } = new List<GroupDto>();
     }
 }

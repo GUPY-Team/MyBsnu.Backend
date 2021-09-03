@@ -11,6 +11,7 @@ namespace Modules.Timetable.Infrastructure.Persistence.EntityConfigurations
             builder.Navigation(c => c.Audiences).AutoInclude();
             builder.Navigation(c => c.Teachers).AutoInclude();
             builder.Navigation(c => c.Course).AutoInclude();
+            builder.Navigation(c => c.Groups).AutoInclude();
 
             builder.HasMany(c => c.Teachers)
                 .WithMany(t => t.Classes);

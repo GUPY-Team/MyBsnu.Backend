@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
@@ -30,6 +32,8 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
 
             var @class = _mapper.Map<Class>(request);
 
+            await UpdateRelatedEntities(@class, request.Audiences, request.Teachers, request.Groups, cancellationToken);
+
             await _dbContext.Classes.AddAsync(@class, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -45,6 +49,8 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             }
 
             _mapper.Map(request, @class);
+
+            await UpdateRelatedEntities(@class, request.Audiences, request.Teachers, request.Groups, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -65,6 +71,22 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
+        }
+
+        private async Task UpdateRelatedEntities(
+            Class @class,
+            IEnumerable<int> audiences,
+            IEnumerable<int> teachers,
+            IEnumerable<int> groups,
+            CancellationToken cancellationToken = default)
+        {
+            @class.Audiences.Clear();
+            @class.Teachers.Clear();
+            @class.Groups.Clear();
+
+            @class.Audiences = await _dbContext.Audiences.Where(a => audiences.Contains(a.Id)).ToListAsync(cancellationToken);
+            @class.Teachers = await _dbContext.Teachers.Where(t => teachers.Contains(t.Id)).ToListAsync(cancellationToken);
+            @class.Groups = await _dbContext.Groups.Where(g => groups.Contains(g.Id)).ToListAsync(cancellationToken);
         }
     }
 }

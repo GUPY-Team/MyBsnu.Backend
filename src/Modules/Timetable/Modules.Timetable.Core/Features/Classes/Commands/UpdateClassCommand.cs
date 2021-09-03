@@ -17,5 +17,6 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
         public int CourseId { get; init; }
         public IEnumerable<int> Teachers { get; init; } = new List<int>();
         public IEnumerable<int> Audiences { get; init; } = new List<int>();
+        public IEnumerable<int> Groups { get; init; } = new List<int>();
     }
 }
