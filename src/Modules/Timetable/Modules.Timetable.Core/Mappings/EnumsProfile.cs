@@ -11,12 +11,12 @@ namespace Modules.Timetable.Core.Mappings
     {
         public string Convert(SmartEnum<TEnum> source, string destination, ResolutionContext context)
         {
-            return source.Name;
+            return source?.Name;
         }
 
         public TEnum Convert(string source, TEnum destination, ResolutionContext context)
         {
-            return SmartEnum<TEnum>.FromName(source);
+            return source == null ? null : SmartEnum<TEnum>.FromName(source);
         }
     }
 
