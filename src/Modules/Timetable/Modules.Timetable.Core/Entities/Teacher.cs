@@ -9,8 +9,6 @@ namespace Modules.Timetable.Core.Entities
         public string LastName { get; set; }
         public string ThirdName { get; set; }
 
-        public string FullName => $"{FirstName} {LastName} {LastName}";
-
         public ICollection<Class> Classes { get; set; }
     }
 }
