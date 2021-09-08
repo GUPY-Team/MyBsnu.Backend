@@ -4,8 +4,8 @@ namespace Shared.DTO
 {
     public class ApiError
     {
-        public int Status { get; set; }
-        public string Message { get; set; }
-        public Dictionary<string, string[]> Errors { get; set; }
+        public int Status { get; init; }
+        public string Message { get; init; }
+        public Dictionary<string, string[]> Errors { get; init; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -14,7 +15,8 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
     public class ScheduleCommandHandler
         : IRequestHandler<UpdateScheduleCommand, ScheduleDto>,
             IRequestHandler<CopyScheduleCommand, Unit>,
-            IRequestHandler<DeleteScheduleCommand, Unit>
+            IRequestHandler<DeleteScheduleCommand, Unit>,
+            IRequestHandler<PublishScheduleCommand, ScheduleDto>
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -75,10 +77,41 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
                 throw new EntityNotFoundException(nameof(Schedule));
             }
 
+            if (schedule.IsPublished)
+            {
+                throw new EntityNotValidException("Can't delete published schedule");
+            }
+
             _dbContext.Schedules.Remove(schedule);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
+        }
+
+        public async Task<ScheduleDto> Handle(PublishScheduleCommand request, CancellationToken cancellationToken)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(request.Id);
+            if (schedule == null)
+            {
+                throw new EntityNotFoundException(nameof(Schedule));
+            }
+
+            if (schedule.IsPublished)
+            {
+                throw new EntityNotValidException("Schedule is already published");
+            }
+
+            var previousPublishedSchedule = await _dbContext.Schedules.SingleOrDefaultAsync(s => s.IsPublished, cancellationToken);
+            if (previousPublishedSchedule != null)
+            {
+                previousPublishedSchedule.IsPublished = false;
+            }
+
+            schedule.IsPublished = true;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return _mapper.Map<ScheduleDto>(schedule);
         }
     }
 }

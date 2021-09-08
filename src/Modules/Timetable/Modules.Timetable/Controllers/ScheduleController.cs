@@ -32,6 +32,13 @@ namespace Modules.Timetable.Controllers
             return Ok(result);
         }
 
+        [HttpDelete("{Id:min(1)}")]
+        public async Task<ActionResult> DeleteSchedule([FromRoute] DeleteScheduleCommand command)
+        {
+            await Mediator.Send(command);
+            return NoContent();
+        }
+        
         [HttpPost]
         public async Task<ActionResult> CopySchedule([FromQuery] CopyScheduleCommand command)
         {
@@ -39,11 +46,12 @@ namespace Modules.Timetable.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{Id:min(1)}")]
-        public async Task<ActionResult> DeleteSchedule([FromRoute] DeleteScheduleCommand command)
+        [HttpPost("{Id:min(1)}/publish")]
+        public async Task<ActionResult<ScheduleDto>> Publish([FromRoute] PublishScheduleCommand command)
         {
-            await Mediator.Send(command);
-            return NoContent();
+            var result = await Mediator.Send(command);
+            return Ok(result);
         }
+
     }
 }

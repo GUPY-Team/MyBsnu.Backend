@@ -43,7 +43,7 @@ namespace Shared.Infrastructure.Middleware
             return exception switch
             {
                 EntityNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.NotFound },
-                EntityNotValidException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
+                EntityNotValidException e => new ApiError { Message = e.Message, Errors = e.Errors, Status = (int) HttpStatusCode.BadRequest },
                 DomainException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
                 SmartEnumNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
                 _ => new ApiError { Message = "Internal server error", Status = (int) HttpStatusCode.InternalServerError }

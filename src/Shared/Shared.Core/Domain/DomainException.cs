@@ -14,7 +14,7 @@ namespace Shared.Core.Domain
     {
         public Dictionary<string, string[]> Errors { get; }
 
-        public EntityNotValidException(string message, Dictionary<string, string[]> errors) : base(message)
+        public EntityNotValidException(string message, Dictionary<string, string[]> errors = null) : base(message)
         {
             Errors = errors;
         }
