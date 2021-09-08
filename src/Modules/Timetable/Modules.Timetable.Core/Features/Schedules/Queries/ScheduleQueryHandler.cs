@@ -48,15 +48,16 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             };
         }
 
-        public Task<List<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
+        public async Task<List<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
         {
-            return _dbContext.Schedules
+            var scheduleList = await _dbContext.Schedules
                 .OrderByDescending(s => s.Year)
                 .ThenByDescending(s => s.Semester)
                 .ThenByDescending(s => s.Version)
                 .AsNoTracking()
-                .ProjectTo<ScheduleDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
+
+            return _mapper.Map<List<ScheduleDto>>(scheduleList);
         }
 
         public async Task<ScheduleDto> Handle(GetScheduleByIdQuery request, CancellationToken cancellationToken)

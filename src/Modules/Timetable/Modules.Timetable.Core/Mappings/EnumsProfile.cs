@@ -36,6 +36,9 @@ namespace Modules.Timetable.Core.Mappings
 
             CreateMap<WeekType, string>().ConvertUsing<EnumConverter<WeekType>>();
             CreateMap<string, WeekType>().ConvertUsing<EnumConverter<WeekType>>();
+
+            CreateMap<Semester, string>().ConvertUsing<EnumConverter<Semester>>();
+            CreateMap<string, Semester>().ConvertUsing<EnumConverter<Semester>>();
         }
     }
 }

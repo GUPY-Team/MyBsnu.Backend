@@ -6,7 +6,7 @@ namespace Modules.Timetable.Core.Abstractions
 {
     public interface IScheduleDbContext : IDbContext
     {
-        DbSet<Entities.Schedule> Schedules { get; set; }
+        DbSet<Schedule> Schedules { get; set; }
         DbSet<Class> Classes { get; set; }
         DbSet<Teacher> Teachers { get; set; }
         DbSet<Group> Groups { get; set; }

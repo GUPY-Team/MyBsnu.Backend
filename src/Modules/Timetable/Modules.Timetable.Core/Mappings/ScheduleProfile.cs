@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Modules.Timetable.Core.Entities;
+using Modules.Timetable.Core.Features.Schedules.Commands;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Mappings
@@ -8,6 +9,7 @@ namespace Modules.Timetable.Core.Mappings
     {
         public ScheduleProfile()
         {
+            CreateMap<UpdateScheduleCommand, Schedule>();
             CreateMap<Schedule, ScheduleDto>();
         }
     }
