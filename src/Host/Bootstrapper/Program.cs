@@ -22,6 +22,7 @@ namespace Bootstrapper
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(minLoglevel)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}",

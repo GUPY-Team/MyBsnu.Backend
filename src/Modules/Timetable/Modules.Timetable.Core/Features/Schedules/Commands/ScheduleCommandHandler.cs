@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -54,16 +53,23 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
                 throw new EntityNotFoundException(nameof(Schedule));
             }
 
-            schedule.Id = default;
-            schedule.IsPublished = false;
-            schedule.Version++;
-
-            foreach (var @class in schedule.Classes)
+            var copiedSchedule = new Schedule
             {
-                @class.Id = default;
-            }
+                Semester = schedule.Semester,
+                Year = schedule.Year,
+                Version = ++schedule.Version,
+                Classes = schedule.Classes.Select(c =>
+                {
+                    c.Id = default;
+                    return c;
+                }).ToList()
+            };
 
-            _dbContext.Schedules.Update(schedule);
+            _dbContext.Teachers.AttachRange(schedule.Classes.SelectMany(c => c.Teachers));
+            _dbContext.Audiences.AttachRange(schedule.Classes.SelectMany(c => c.Audiences));
+            _dbContext.Groups.AttachRange(schedule.Classes.SelectMany(c => c.Groups));
+            
+            await _dbContext.Schedules.AddAsync(copiedSchedule, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
