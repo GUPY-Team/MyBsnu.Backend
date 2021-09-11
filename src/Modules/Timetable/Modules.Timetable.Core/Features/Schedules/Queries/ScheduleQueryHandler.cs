@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
@@ -17,7 +16,8 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
         : IRequestHandler<GetLatestGroupScheduleQuery, GroupScheduleDto>,
             IRequestHandler<GetScheduleListQuery, List<ScheduleDto>>,
             IRequestHandler<GetScheduleByIdQuery, ScheduleDto>,
-            IRequestHandler<GetGroupScheduleQuery, GroupScheduleDto>
+            IRequestHandler<GetGroupScheduleQuery, GroupScheduleDto>,
+            IRequestHandler<GetLatestTeacherScheduleQuery, TeacherScheduleDto>
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -30,7 +30,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
         public async Task<GroupScheduleDto> Handle(GetLatestGroupScheduleQuery request, CancellationToken cancellationToken)
         {
-            var group = await _dbContext.Groups.FindAsync(request.GroupId);
+            var group = await _dbContext.Groups
+                .AsNoTracking()
+                .SingleOrDefaultAsync(g => g.Id == request.GroupId, cancellationToken);
             if (group == null)
             {
                 throw new EntityNotFoundException(nameof(Group));
@@ -44,17 +46,17 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             {
                 Year = schedule.Year,
                 Semester = schedule.Semester.Name,
-                Classes = MapToClasses(schedule.Classes)
+                Classes = MapToScheduleClasses(schedule.Classes)
             };
         }
 
         public async Task<List<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
         {
             var scheduleList = await _dbContext.Schedules
+                .AsNoTracking()
                 .OrderByDescending(s => s.Year)
                 .ThenByDescending(s => s.Semester)
                 .ThenByDescending(s => s.Version)
-                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<ScheduleDto>>(scheduleList);
@@ -62,7 +64,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
         public async Task<ScheduleDto> Handle(GetScheduleByIdQuery request, CancellationToken cancellationToken)
         {
-            var schedule = await _dbContext.Schedules.SingleOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .SingleOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
             if (schedule == null)
             {
                 throw new EntityNotFoundException(nameof(Schedule));
@@ -73,7 +77,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
         public async Task<GroupScheduleDto> Handle(GetGroupScheduleQuery request, CancellationToken cancellationToken)
         {
-            var group = await _dbContext.Groups.FindAsync(request.GroupId);
+            var group = await _dbContext.Groups
+                .AsNoTracking()
+                .SingleOrDefaultAsync(g => g.Id == request.GroupId, cancellationToken);
             if (group == null)
             {
                 throw new EntityNotFoundException(nameof(Group));
@@ -92,7 +98,38 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             {
                 Year = schedule.Year,
                 Semester = schedule.Semester.Name,
-                Classes = MapToClasses(schedule.Classes)
+                Classes = MapToScheduleClasses(schedule.Classes)
+            };
+        }
+
+        public async Task<TeacherScheduleDto> Handle(GetLatestTeacherScheduleQuery request, CancellationToken cancellationToken)
+        {
+            var teacher = await _dbContext.Teachers
+                .AsNoTracking()
+                .SingleOrDefaultAsync(t => t.Id == request.TeacherId, cancellationToken);
+            if (teacher == null)
+            {
+                throw new EntityNotFoundException(nameof(Teacher));
+            }
+
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .Include(s => s.Classes
+                    .Where(c => c.Teachers
+                        .Select(t => t.Id)
+                        .Contains(request.TeacherId)
+                    )
+                ).Where(s => s.IsPublished)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (schedule == null)
+            {
+                throw new EntityNotFoundException(nameof(Schedule));
+            }
+
+            return new TeacherScheduleDto
+            {
+                Classes = MapToScheduleClasses(schedule.Classes)
             };
         }
 
@@ -107,7 +144,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
                 );
         }
 
-        private Dictionary<string, ClassDto[]> MapToClasses(IEnumerable<Class> classes)
+        private Dictionary<string, ClassDto[]> MapToScheduleClasses(IEnumerable<Class> classes)
         {
             return classes.GroupBy(c => c.WeekDay)
                 .OrderBy(g => g.Key)
