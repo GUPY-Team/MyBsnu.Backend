@@ -16,7 +16,7 @@ namespace Modules.Timetable.Core.Mappings
 
         public TEnum Convert(string source, TEnum destination, ResolutionContext context)
         {
-            return source == null ? null : SmartEnum<TEnum>.FromName(source);
+            return source == null ? null : SmartEnum<TEnum>.FromName(source, true);
         }
     }
 
