@@ -38,6 +38,8 @@ namespace Shared.Infrastructure.Extensions
 
             services.AddCorsPolicy();
 
+            services.AddMemoryCache();
+            
             return services;
         }
 

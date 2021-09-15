@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Modules.Timetable.Core.Abstractions;
+using Modules.Timetable.Core.Constants;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
@@ -21,15 +24,23 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper)
+        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper, IMemoryCache cache)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _cache = cache;
         }
 
         public async Task<GroupScheduleDto> Handle(GetLatestGroupScheduleQuery request, CancellationToken cancellationToken)
         {
+            var cachedSchedule = _cache.Get<GroupScheduleDto>(CacheKeys.LatestGroupSchedule(request.GroupId));
+            if (cachedSchedule != null)
+            {
+                return cachedSchedule;
+            }
+
             var group = await _dbContext.Groups
                 .AsNoTracking()
                 .SingleOrDefaultAsync(g => g.Id == request.GroupId, cancellationToken);
@@ -42,12 +53,16 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
                 .Where(s => s.IsPublished)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            return new GroupScheduleDto
+            var groupSchedule = new GroupScheduleDto
             {
                 Year = schedule.Year,
                 Semester = schedule.Semester.Name,
                 Classes = MapToScheduleClasses(schedule.Classes)
             };
+
+            _cache.Set(CacheKeys.LatestGroupSchedule(request.GroupId), groupSchedule, TimeSpan.FromMinutes(30));
+
+            return groupSchedule;
         }
 
         public async Task<List<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
@@ -104,6 +119,12 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
 
         public async Task<TeacherScheduleDto> Handle(GetLatestTeacherScheduleQuery request, CancellationToken cancellationToken)
         {
+            var cachedSchedule = _cache.Get<TeacherScheduleDto>(CacheKeys.LatestTeacherSchedule(request.TeacherId));
+            if (cachedSchedule != null)
+            {
+                return cachedSchedule;
+            }
+
             var teacher = await _dbContext.Teachers
                 .AsNoTracking()
                 .SingleOrDefaultAsync(t => t.Id == request.TeacherId, cancellationToken);
@@ -127,10 +148,14 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
                 throw new EntityNotFoundException(nameof(Schedule));
             }
 
-            return new TeacherScheduleDto
+            var teacherSchedule = new TeacherScheduleDto
             {
                 Classes = MapToScheduleClasses(schedule.Classes)
             };
+
+            _cache.Set(CacheKeys.LatestTeacherSchedule(request.TeacherId), teacherSchedule, TimeSpan.FromMinutes(30));
+
+            return teacherSchedule;
         }
 
         private IQueryable<Schedule> GetGroupSchedule(int groupId)
