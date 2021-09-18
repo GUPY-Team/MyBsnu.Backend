@@ -11,4 +11,34 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="errors.AudiencesOccupied" xml:space="preserve">
+        <value>Аудитории: {0} заняты</value>
+    </data>
+    <data name="errors.DeletePublishedSchedule" xml:space="preserve">
+        <value>Невозможно удалить опубликованное рассписание</value>
+    </data>
+    <data name="errors.EnumNotFound" xml:space="preserve">
+        <value>Указан несуществующий член перечисления</value>
+    </data>
+    <data name="errors.GroupsBusy" xml:space="preserve">
+        <value>Группы {0} уже имеют пару в заданое время</value>
+    </data>
+    <data name="errors.Internal" xml:space="preserve">
+        <value>Внутренняя ошибка сервера</value>
+    </data>
+    <data name="errors.InvalidCredentials" xml:space="preserve">
+        <value>Неверный емейл или пароль</value>
+    </data>
+    <data name="errors.NotFound" xml:space="preserve">
+        <value>Сущность {0} не найдена</value>
+    </data>
+    <data name="errors.SchedulePublished" xml:space="preserve">
+        <value>Рассписание уже опубликовано</value>
+    </data>
+    <data name="errors.TeachersBusy" xml:space="preserve">
+        <value>Учителя: {0} уже ведут пару в заданое время</value>
+    </data>
+    <data name="errors.UnableToSignup" xml:space="preserve">
+        <value>Незвомжно зарегестрировать пользователя: {0}</value>
+    </data>
 </root>
