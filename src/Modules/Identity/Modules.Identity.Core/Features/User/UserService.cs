@@ -4,10 +4,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Entities;
 using Modules.Identity.Core.Exceptions;
 using Shared.DTO.Identity;
+using Shared.Localization;
 
 namespace Modules.Identity.Core.Features.User
 {
@@ -17,13 +19,20 @@ namespace Modules.Identity.Core.Features.User
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer<Locale> _localizer;
 
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IMapper mapper)
+        public UserService(
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+            ITokenService tokenService,
+            IMapper mapper,
+            IStringLocalizer<Locale> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
         public async Task SignupUser(SignupUserRequest request)
@@ -34,7 +43,7 @@ namespace Modules.Identity.Core.Features.User
 
             if (!result.Succeeded)
             {
-                throw new IdentityException($"Unable to signup user: {result.Errors.First().Description}");
+                throw new IdentityException(_localizer.GetString("errors.UnableToSignup", result.Errors.First().Description));
             }
         }
 
@@ -43,13 +52,13 @@ namespace Modules.Identity.Core.Features.User
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new IdentityException("Invalid password or email");
+                throw new IdentityException(_localizer.GetString("errors.InvalidCredentials"));
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (!result.Succeeded)
             {
-                throw new IdentityException("Invalid password or email");
+                throw new IdentityException(_localizer.GetString("errors.InvalidCredentials"));
             }
 
             var userClaims = await _userManager.GetClaimsAsync(user);

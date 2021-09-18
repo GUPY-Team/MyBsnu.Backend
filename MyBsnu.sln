@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Timetable.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Timetable", "src\Modules\Timetable\Modules.Timetable\Modules.Timetable.csproj", "{30E2F37C-936B-4EA0-89E6-F29018C8CFD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Localization", "src\Shared\Shared.Localization\Shared.Localization.csproj", "{C63C74DD-F084-4848-B196-26683FE55497}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,7 @@ Global
 		{7033CB55-09D8-4D20-ADEC-F60033CA3E55} = {F06527A1-3A56-48C9-91CF-59F03A91D39A}
 		{27A2B6F7-89B5-4D54-804E-57959B7A51D4} = {F06527A1-3A56-48C9-91CF-59F03A91D39A}
 		{30E2F37C-936B-4EA0-89E6-F29018C8CFD5} = {F06527A1-3A56-48C9-91CF-59F03A91D39A}
+		{C63C74DD-F084-4848-B196-26683FE55497} = {CD17FB2B-413D-4C3B-96CC-2B2511C3A06D}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C4F4AC7E-39FA-4084-BB20-E53160595E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -95,5 +98,9 @@ Global
 		{30E2F37C-936B-4EA0-89E6-F29018C8CFD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30E2F37C-936B-4EA0-89E6-F29018C8CFD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30E2F37C-936B-4EA0-89E6-F29018C8CFD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63C74DD-F084-4848-B196-26683FE55497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63C74DD-F084-4848-B196-26683FE55497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63C74DD-F084-4848-B196-26683FE55497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63C74DD-F084-4848-B196-26683FE55497}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

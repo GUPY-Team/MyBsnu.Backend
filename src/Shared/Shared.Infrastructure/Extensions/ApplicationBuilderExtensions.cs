@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Globalization;
+using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Serilog;
 using Shared.Infrastructure.Middleware;
 
@@ -10,6 +13,17 @@ namespace Shared.Infrastructure.Extensions
         public static IApplicationBuilder UseSharedMiddleware(this IApplicationBuilder app)
         {
             app.UseSerilogRequestLogging();
+
+            app.UseRequestLocalization(o =>
+            {
+                var supportedCultures = new[] { "uk-UA", "en-US", "ru-RU" };
+
+                o.SetDefaultCulture(supportedCultures[0]);
+                o.AddSupportedCultures(supportedCultures);
+                o.AddSupportedUICultures(supportedCultures);
+
+                o.ApplyCurrentCultureToResponseHeaders = true;
+            });
 
             app.UseMiddleware<ExceptionHandlerMiddleware>();
 

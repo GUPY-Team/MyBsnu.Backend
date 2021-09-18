@@ -17,4 +17,8 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Shared.Localization\Shared.Localization.csproj" />
+    </ItemGroup>
+
 </Project>

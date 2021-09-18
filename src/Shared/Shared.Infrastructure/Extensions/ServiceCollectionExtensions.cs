@@ -31,8 +31,7 @@ namespace Shared.Infrastructure.Extensions
             services.AddControllers()
                 .AddFluentValidation(o => { o.DisableDataAnnotationsValidation = true; });
 
-            // TODO: Add localization
-            // services.AddLocalization();
+            services.AddLocalization(o => o.ResourcesPath = "Resources");
 
             services.AddSwagger();
 

@@ -3,19 +3,23 @@ using System.Net;
 using System.Threading.Tasks;
 using Ardalis.SmartEnum;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Shared.Core.Domain;
 using Shared.DTO;
+using Shared.Localization;
 
 namespace Shared.Infrastructure.Middleware
 {
     public class ExceptionHandlerMiddleware : IMiddleware
     {
         private readonly ILogger<ExceptionHandlerMiddleware> _logger;
+        private readonly IStringLocalizer<Locale> _localizer;
 
-        public ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger)
+        public ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger, IStringLocalizer<Locale> localizer)
         {
             _logger = logger;
+            _localizer = localizer;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -42,11 +46,23 @@ namespace Shared.Infrastructure.Middleware
         {
             return exception switch
             {
-                EntityNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.NotFound },
+                EntityNotFoundException e => new ApiError
+                {
+                    Message = _localizer.GetString("errors.NotFound", e.EntityName),
+                    Status = (int) HttpStatusCode.NotFound
+                },
                 EntityNotValidException e => new ApiError { Message = e.Message, Errors = e.Errors, Status = (int) HttpStatusCode.BadRequest },
                 DomainException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
-                SmartEnumNotFoundException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
-                _ => new ApiError { Message = "Internal server error", Status = (int) HttpStatusCode.InternalServerError }
+                SmartEnumNotFoundException e => new ApiError
+                {
+                    Message = _localizer.GetString("errors.EnumNotFound"),
+                    Status = (int) HttpStatusCode.BadRequest
+                },
+                _ => new ApiError
+                {
+                    Message = _localizer.GetString("errors.Internal"),
+                    Status = (int) HttpStatusCode.InternalServerError
+                }
             };
         }
     }

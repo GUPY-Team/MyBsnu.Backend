@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
+using Shared.Localization;
 
 namespace Modules.Timetable.Core.Features.Schedules.Commands
 {
@@ -19,11 +21,13 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer<Locale> _localizer;
 
-        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper)
+        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper, IStringLocalizer<Locale> localizer)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
         public async Task<ScheduleDto> Handle(UpdateScheduleCommand request, CancellationToken cancellationToken)
@@ -85,7 +89,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
 
             if (schedule.IsPublished)
             {
-                throw new EntityNotValidException("Can't delete published schedule");
+                throw new EntityNotValidException(_localizer.GetString("errors.DeletePublishedSchedule"));
             }
 
             _dbContext.Schedules.Remove(schedule);
@@ -104,7 +108,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
 
             if (schedule.IsPublished)
             {
-                throw new EntityNotValidException("Schedule is already published");
+                throw new EntityNotValidException(_localizer.GetString("errors.SchedulePublished"));
             }
 
             var previousPublishedSchedule = await _dbContext.Schedules.SingleOrDefaultAsync(s => s.IsPublished, cancellationToken);

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.DTO.Schedule;
+using Shared.Localization;
 
 namespace Modules.Timetable.Core.Features.Classes.Commands
 {
@@ -20,11 +22,13 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer<Locale> _localizer;
 
-        public ClassCommandHandler(IScheduleDbContext dbContext, IMapper mapper)
+        public ClassCommandHandler(IScheduleDbContext dbContext, IMapper mapper, IStringLocalizer<Locale> localizer)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
         public async Task<ClassDto> Handle(CreateClassCommand request, CancellationToken cancellationToken)
@@ -105,19 +109,22 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
                 var teachers = overlap.Teachers.Intersect(@class.Teachers).Select(t => t.ShortName).ToList();
                 if (teachers.Any())
                 {
-                    throw new EntityNotValidException($"Teacher(s): {string.Join(',', teachers)} are busy");
+                    var message = _localizer.GetString("errors.TeachersBusy", string.Join(',', teachers));
+                    throw new EntityNotValidException(message);
                 }
 
                 var audiences = overlap.Audiences.Intersect(@class.Audiences).Select(a => a.FullNumber).ToList();
                 if (audiences.Any())
                 {
-                    throw new EntityNotValidException($"Audience(s): {string.Join(',', audiences)} are occupied");
+                    var message = _localizer.GetString("errors.AudiencesOccupied", string.Join(',', audiences));
+                    throw new EntityNotValidException(message);
                 }
 
                 var groups = overlap.Groups.Intersect(@class.Groups).Select(g => g.Number).ToList();
                 if (groups.Any())
                 {
-                    throw new EntityNotValidException($"Group(s): {string.Join(',', groups)} are busy");
+                    var message = _localizer.GetString("errors.GroupsBusy", string.Join(',', groups));
+                    throw new EntityNotValidException(message);
                 }
             }
         }
