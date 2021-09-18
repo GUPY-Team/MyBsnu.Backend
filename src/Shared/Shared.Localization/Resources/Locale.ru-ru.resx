@@ -27,7 +27,7 @@
         <value>Внутренняя ошибка сервера</value>
     </data>
     <data name="errors.InvalidCredentials" xml:space="preserve">
-        <value>Неверный емейл или пароль</value>
+        <value>Неверный e-mail или пароль</value>
     </data>
     <data name="errors.NotFound" xml:space="preserve">
         <value>Сущность {0} не найдена</value>
