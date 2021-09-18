@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,11 +29,16 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
 
         public async Task<ClassDto> Handle(CreateClassCommand request, CancellationToken cancellationToken)
         {
-            // TODO: Add related entities check
+            var schedule = await _dbContext.Schedules.FindAsync(request.ScheduleId);
+            if (schedule == null)
+            {
+                throw new EntityNotFoundException(nameof(Schedule));
+            }
 
             var @class = _mapper.Map<Class>(request);
 
             await UpdateRelatedEntities(@class, request.Audiences, request.Teachers, request.Groups, cancellationToken);
+            await ValidateClass(@class, cancellationToken);
 
             await _dbContext.Classes.AddAsync(@class, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -51,6 +57,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             _mapper.Map(request, @class);
 
             await UpdateRelatedEntities(@class, request.Audiences, request.Teachers, request.Groups, cancellationToken);
+            await ValidateClass(@class, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -87,6 +94,53 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             @class.Audiences = await _dbContext.Audiences.Where(a => audiences.Contains(a.Id)).ToListAsync(cancellationToken);
             @class.Teachers = await _dbContext.Teachers.Where(t => teachers.Contains(t.Id)).ToListAsync(cancellationToken);
             @class.Groups = await _dbContext.Groups.Where(g => groups.Contains(g.Id)).ToListAsync(cancellationToken);
+        }
+
+        private async Task ValidateClass(Class @class, CancellationToken cancellationToken)
+        {
+            var overlaps = await GetOverlappingClassesWith(@class).ToListAsync(cancellationToken);
+
+            foreach (var overlap in overlaps)
+            {
+                var teachers = overlap.Teachers.Intersect(@class.Teachers).Select(t => t.ShortName).ToList();
+                if (teachers.Any())
+                {
+                    throw new EntityNotValidException($"Teacher(s): {string.Join(',', teachers)} are busy");
+                }
+
+                var audiences = overlap.Audiences.Intersect(@class.Audiences).Select(a => a.FullNumber).ToList();
+                if (audiences.Any())
+                {
+                    throw new EntityNotValidException($"Audience(s): {string.Join(',', audiences)} are occupied");
+                }
+
+                var groups = overlap.Groups.Intersect(@class.Groups).Select(g => g.Number).ToList();
+                if (groups.Any())
+                {
+                    throw new EntityNotValidException($"Group(s): {string.Join(',', groups)} are busy");
+                }
+            }
+        }
+
+        private IQueryable<Class> GetOverlappingClassesWith(Class @class)
+        {
+            var baseQuery = _dbContext.Classes
+                .Where(c => c.Id != @class.Id)
+                .Where(c => c.ScheduleId == @class.ScheduleId)
+                .Where(c => c.StartTime == @class.StartTime)
+                .Where(c => c.WeekDay == @class.WeekDay)
+                .Where(c =>
+                    c.Teachers.Any(t => @class.Teachers.Select(x => x.Id).Contains(t.Id)) ||
+                    c.Audiences.Any(t => @class.Audiences.Select(x => x.Id).Contains(t.Id)) ||
+                    c.Groups.Any(t => @class.Groups.Select(x => x.Id).Contains(t.Id))
+                );
+
+            if (@class.WeekType != null)
+            {
+                baseQuery = baseQuery.Where(c => c.WeekType == null || c.WeekType == @class.WeekType);
+            }
+
+            return baseQuery;
         }
     }
 }
