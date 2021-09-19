@@ -17,14 +17,9 @@ namespace Modules.Timetable.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{scheduleId:min(1)}")]
-        public async Task<ActionResult<GroupScheduleDto>> GetGroupSchedule([FromRoute] int scheduleId, [FromQuery, BindRequired] int groupId)
+        [HttpGet]
+        public async Task<ActionResult<GroupScheduleDto>> GetGroupSchedule([FromQuery] GetGroupScheduleQuery query)
         {
-            var query = new GetGroupScheduleQuery
-            {
-                GroupId = groupId,
-                ScheduleId = scheduleId
-            };
             var result = await Mediator.Send(query);
             return Ok(result);
         }
