@@ -11,13 +11,15 @@ using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Constants;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Extensions;
+using Shared.DTO;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Schedules.Queries
 {
     public class ScheduleCommandHandler
         : IRequestHandler<GetLatestGroupScheduleQuery, GroupScheduleDto>,
-            IRequestHandler<GetScheduleListQuery, List<ScheduleDto>>,
+            IRequestHandler<GetScheduleListQuery, PagedList<ScheduleDto>>,
             IRequestHandler<GetScheduleByIdQuery, ScheduleDto>,
             IRequestHandler<GetGroupScheduleQuery, GroupScheduleDto>,
             IRequestHandler<GetLatestTeacherScheduleQuery, TeacherScheduleDto>,
@@ -66,16 +68,19 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             return groupSchedule;
         }
 
-        public async Task<List<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
+        public async Task<PagedList<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
         {
             var scheduleList = await _dbContext.Schedules
                 .AsNoTracking()
                 .OrderByDescending(s => s.Year)
                 .ThenByDescending(s => s.Semester)
                 .ThenByDescending(s => s.Version)
+                .Paginate(request.Page, request.PageSize)
                 .ToListAsync(cancellationToken);
+            var totalItems = await _dbContext.Schedules.CountAsync(cancellationToken);
 
-            return _mapper.Map<List<ScheduleDto>>(scheduleList);
+            var mappedItems = _mapper.Map<List<ScheduleDto>>(scheduleList);
+            return new PagedList<ScheduleDto>(mappedItems, request.Page, request.PageSize, totalItems);
         }
 
         public async Task<ScheduleDto> Handle(GetScheduleByIdQuery request, CancellationToken cancellationToken)

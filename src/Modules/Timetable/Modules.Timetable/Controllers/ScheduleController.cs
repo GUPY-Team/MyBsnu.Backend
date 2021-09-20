@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Schedules.Commands;
 using Modules.Timetable.Core.Features.Schedules.Queries;
+using Shared.DTO;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
@@ -12,9 +12,9 @@ namespace Modules.Timetable.Controllers
     public class ScheduleController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<List<ScheduleDto>>> GetScheduleList()
+        public async Task<ActionResult<PagedList<ScheduleDto>>> GetScheduleList([FromQuery] GetScheduleListQuery query)
         {
-            var result = await Mediator.Send(new GetScheduleListQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 
