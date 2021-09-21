@@ -5,6 +5,7 @@ using MediatR;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Groups.Commands
@@ -36,10 +37,7 @@ namespace Modules.Timetable.Core.Features.Groups.Commands
         public async Task<GroupDto> Handle(UpdateGroupCommand request, CancellationToken cancellationToken)
         {
             var group = await _dbContext.Groups.FindAsync(request.Id);
-            if (group == null)
-            {
-                throw new EntityNotFoundException(nameof(Group));
-            }
+            Guard.RequireEntityNotNull(group);
 
             _mapper.Map(request, group);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -50,10 +48,7 @@ namespace Modules.Timetable.Core.Features.Groups.Commands
         public async Task<Unit> Handle(DeleteGroupCommand request, CancellationToken cancellationToken)
         {
             var group = await _dbContext.Groups.FindAsync(request.Id);
-            if (group == null)
-            {
-                throw new EntityNotFoundException(nameof(Group));
-            }
+            Guard.RequireEntityNotNull(group);
 
             _dbContext.Groups.Remove(group);
             await _dbContext.SaveChangesAsync(cancellationToken);

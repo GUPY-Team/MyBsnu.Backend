@@ -8,6 +8,7 @@ using Microsoft.Extensions.Localization;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 using Shared.Localization;
 
@@ -30,13 +31,13 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             _localizer = localizer;
         }
 
+        /// <summary>
+        /// Update Schedule
+        /// </summary>
         public async Task<ScheduleDto> Handle(UpdateScheduleCommand request, CancellationToken cancellationToken)
         {
             var schedule = await _dbContext.Schedules.FindAsync(request.Id);
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             _mapper.Map(request, schedule);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -44,6 +45,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             return _mapper.Map<ScheduleDto>(schedule);
         }
 
+        /// <summary>
+        /// Copy Schedule
+        /// </summary>
         public async Task<Unit> Handle(CopyScheduleCommand request, CancellationToken cancellationToken)
         {
             var schedule = await _dbContext.Schedules
@@ -51,11 +55,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
                 .Where(s => s.Id == request.SourceId)
                 .Include(s => s.Classes)
                 .FirstOrDefaultAsync(cancellationToken);
-
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             var copiedSchedule = new Schedule
             {
@@ -79,13 +79,13 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             return Unit.Value;
         }
 
+        /// <summary>
+        /// Delete Schedule
+        /// </summary>
         public async Task<Unit> Handle(DeleteScheduleCommand request, CancellationToken cancellationToken)
         {
             var schedule = await _dbContext.Schedules.FindAsync(request.Id);
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             if (schedule.IsPublished)
             {
@@ -98,13 +98,13 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             return Unit.Value;
         }
 
+        /// <summary>
+        /// Publish Schedule
+        /// </summary>
         public async Task<ScheduleDto> Handle(PublishScheduleCommand request, CancellationToken cancellationToken)
         {
             var schedule = await _dbContext.Schedules.FindAsync(request.Id);
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             if (schedule.IsPublished)
             {

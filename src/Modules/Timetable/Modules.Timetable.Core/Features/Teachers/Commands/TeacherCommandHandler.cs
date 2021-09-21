@@ -5,6 +5,7 @@ using MediatR;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Teachers.Commands
@@ -36,10 +37,7 @@ namespace Modules.Timetable.Core.Features.Teachers.Commands
         public async Task<TeacherDto> Handle(UpdateTeacherCommand request, CancellationToken cancellationToken)
         {
             var teacher = await _dbContext.Teachers.FindAsync(request.Id);
-            if (teacher == null)
-            {
-                throw new EntityNotFoundException(nameof(Teacher));
-            }
+            Guard.RequireEntityNotNull(teacher);
 
             _mapper.Map(request, teacher);
 
@@ -51,10 +49,7 @@ namespace Modules.Timetable.Core.Features.Teachers.Commands
         public async Task<Unit> Handle(DeleteTeacherCommand request, CancellationToken cancellationToken)
         {
             var teacher = await _dbContext.Teachers.FindAsync(request.Id);
-            if (teacher == null)
-            {
-                throw new EntityNotFoundException(nameof(Teacher));
-            }
+            Guard.RequireEntityNotNull(teacher);
 
             _dbContext.Teachers.Remove(teacher);
             await _dbContext.SaveChangesAsync(cancellationToken);

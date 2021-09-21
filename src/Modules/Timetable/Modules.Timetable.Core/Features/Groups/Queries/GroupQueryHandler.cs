@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Groups.Queries
@@ -28,10 +29,7 @@ namespace Modules.Timetable.Core.Features.Groups.Queries
         public async Task<GroupDto> Handle(GetGroupByIdQuery request, CancellationToken cancellationToken)
         {
             var group = await _dbContext.Groups.FindAsync(request.Id);
-            if (group == null)
-            {
-                throw new EntityNotFoundException(nameof(Group));
-            }
+            Guard.RequireEntityNotNull(group);
 
             return _mapper.Map<GroupDto>(group);
         }

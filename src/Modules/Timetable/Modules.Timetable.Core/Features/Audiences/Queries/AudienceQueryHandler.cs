@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Audiences.Queries
@@ -28,10 +29,7 @@ namespace Modules.Timetable.Core.Features.Audiences.Queries
         public async Task<AudienceDto> Handle(GetAudienceByIdQuery request, CancellationToken cancellationToken)
         {
             var audience = await _dbContext.Audiences.FindAsync(request.Id);
-            if (audience == null)
-            {
-                throw new EntityNotFoundException(nameof(Audience));
-            }
+            Guard.RequireEntityNotNull(audience);
 
             return _mapper.Map<AudienceDto>(audience);
         }

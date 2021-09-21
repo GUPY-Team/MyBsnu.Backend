@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Modules.Timetable.Core.Abstractions;
-using Modules.Timetable.Core.Constants;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
 using Shared.Core.Extensions;
+using Shared.Core.Helpers;
 using Shared.DTO;
 using Shared.DTO.Schedule;
 
@@ -27,47 +25,36 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly IMemoryCache _cache;
 
-        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper, IMemoryCache cache)
+        public ScheduleCommandHandler(IScheduleDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _cache = cache;
         }
 
+        /// <summary>
+        /// Get Latest Group Schedule
+        /// </summary>
         public async Task<GroupScheduleDto> Handle(GetLatestGroupScheduleQuery request, CancellationToken cancellationToken)
         {
-            var cachedSchedule = _cache.Get<GroupScheduleDto>(CacheKeys.LatestGroupSchedule(request.GroupId));
-            if (cachedSchedule != null)
-            {
-                return cachedSchedule;
-            }
-
-            var group = await _dbContext.Groups
-                .AsNoTracking()
-                .SingleOrDefaultAsync(g => g.Id == request.GroupId, cancellationToken);
-            if (group == null)
-            {
-                throw new EntityNotFoundException(nameof(Group));
-            }
+            var group = await _dbContext.Groups.FindAsync(request.GroupId);
+            Guard.RequireEntityNotNull(group);
 
             var schedule = await GetGroupSchedule(request.GroupId)
                 .Where(s => s.IsPublished)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var groupSchedule = new GroupScheduleDto
+            return new GroupScheduleDto
             {
                 Year = schedule.Year,
                 Semester = schedule.Semester.Name,
                 Classes = MapToScheduleClasses(schedule.Classes)
             };
-
-            _cache.Set(CacheKeys.LatestGroupSchedule(request.GroupId), groupSchedule, TimeSpan.FromMinutes(30));
-
-            return groupSchedule;
         }
 
+        /// <summary>
+        /// Get Schedule List 
+        /// </summary>
         public async Task<PagedList<ScheduleDto>> Handle(GetScheduleListQuery request, CancellationToken cancellationToken)
         {
             var scheduleList = await _dbContext.Schedules
@@ -83,37 +70,29 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             return new PagedList<ScheduleDto>(mappedItems, request.Page, request.PageSize, totalItems);
         }
 
+        /// <summary>
+        /// Get Schedule By Id
+        /// </summary>
         public async Task<ScheduleDto> Handle(GetScheduleByIdQuery request, CancellationToken cancellationToken)
         {
-            var schedule = await _dbContext.Schedules
-                .AsNoTracking()
-                .SingleOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            var schedule = await _dbContext.Schedules.FindAsync(request.Id);
+            Guard.RequireEntityNotNull(schedule);
 
             return _mapper.Map<ScheduleDto>(schedule);
         }
 
+        /// <summary>
+        /// Get Group Schedule
+        /// </summary>
         public async Task<GroupScheduleDto> Handle(GetGroupScheduleQuery request, CancellationToken cancellationToken)
         {
-            var group = await _dbContext.Groups
-                .AsNoTracking()
-                .SingleOrDefaultAsync(g => g.Id == request.GroupId, cancellationToken);
-            if (group == null)
-            {
-                throw new EntityNotFoundException(nameof(Group));
-            }
+            var group = await _dbContext.Groups.FindAsync(request.GroupId);
+            Guard.RequireEntityNotNull(group);
 
             var schedule = await GetGroupSchedule(request.GroupId)
                 .Where(s => s.Id == request.ScheduleId)
                 .FirstOrDefaultAsync(cancellationToken);
-
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             return new GroupScheduleDto
             {
@@ -123,59 +102,39 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             };
         }
 
+        /// <summary>
+        /// Get Latest Teacher Schedule
+        /// </summary>
         public async Task<TeacherScheduleDto> Handle(GetLatestTeacherScheduleQuery request, CancellationToken cancellationToken)
         {
-            var cachedSchedule = _cache.Get<TeacherScheduleDto>(CacheKeys.LatestTeacherSchedule(request.TeacherId));
-            if (cachedSchedule != null)
-            {
-                return cachedSchedule;
-            }
-
-            var teacher = await _dbContext.Teachers
-                .AsNoTracking()
-                .SingleOrDefaultAsync(t => t.Id == request.TeacherId, cancellationToken);
-            if (teacher == null)
-            {
-                throw new EntityNotFoundException(nameof(Teacher));
-            }
+            var teacher = await _dbContext.Teachers.FindAsync(request.TeacherId);
+            Guard.RequireEntityNotNull(teacher);
 
             var schedule = await GetTeacherSchedule(teacher.Id)
                 .Where(s => s.IsPublished)
                 .FirstOrDefaultAsync(cancellationToken);
+            Guard.RequireEntityNotNull(schedule);
 
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
-
-            var teacherSchedule = new TeacherScheduleDto
+            return new TeacherScheduleDto
             {
                 Classes = MapToScheduleClasses(schedule.Classes)
             };
-
-            _cache.Set(CacheKeys.LatestTeacherSchedule(request.TeacherId), teacherSchedule, TimeSpan.FromMinutes(30));
-
-            return teacherSchedule;
         }
 
+        /// <summary>
+        /// Get Teacher Schedule
+        /// </summary>
         public async Task<TeacherScheduleDto> Handle(GetTeacherScheduleQuery request, CancellationToken cancellationToken)
         {
             var teacher = await _dbContext.Teachers
                 .AsNoTracking()
                 .SingleOrDefaultAsync(t => t.Id == request.TeacherId, cancellationToken);
-            if (teacher == null)
-            {
-                throw new EntityNotFoundException(nameof(Teacher));
-            }
+            Guard.RequireEntityNotNull(teacher);
 
             var schedule = await GetTeacherSchedule(teacher.Id)
                 .Where(s => s.Id == request.ScheduleId)
                 .FirstOrDefaultAsync(cancellationToken);
-
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             return new TeacherScheduleDto
             {

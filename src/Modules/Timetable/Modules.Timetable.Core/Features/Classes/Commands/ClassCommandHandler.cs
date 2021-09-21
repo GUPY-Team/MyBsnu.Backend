@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Localization;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 using Shared.Localization;
 
@@ -34,10 +34,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
         public async Task<ClassDto> Handle(CreateClassCommand request, CancellationToken cancellationToken)
         {
             var schedule = await _dbContext.Schedules.FindAsync(request.ScheduleId);
-            if (schedule == null)
-            {
-                throw new EntityNotFoundException(nameof(Schedule));
-            }
+            Guard.RequireEntityNotNull(schedule);
 
             var @class = _mapper.Map<Class>(request);
 
@@ -53,10 +50,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
         public async Task<ClassDto> Handle(UpdateClassCommand request, CancellationToken cancellationToken)
         {
             var @class = await _dbContext.Classes.FindAsync(request.Id);
-            if (@class == null)
-            {
-                throw new EntityNotFoundException(nameof(Class));
-            }
+            Guard.RequireEntityNotNull(@class);
 
             _mapper.Map(request, @class);
 
@@ -73,10 +67,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             var @class = await _dbContext.Classes
                 .IgnoreAutoIncludes()
                 .SingleOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
-            if (@class == null)
-            {
-                throw new EntityNotFoundException(nameof(Class));
-            }
+            Guard.RequireEntityNotNull(@class);
 
             _dbContext.Classes.Remove(@class);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -89,7 +80,7 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
             IEnumerable<int> audiences,
             IEnumerable<int> teachers,
             IEnumerable<int> groups,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             @class.Audiences.Clear();
             @class.Teachers.Clear();

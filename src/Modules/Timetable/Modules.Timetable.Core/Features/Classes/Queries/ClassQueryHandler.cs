@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Classes.Queries
@@ -27,10 +28,7 @@ namespace Modules.Timetable.Core.Features.Classes.Queries
             var @class = await _dbContext.Classes
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
-            if (@class == null)
-            {
-                throw new EntityNotFoundException(nameof(Class));
-            }
+            Guard.RequireEntityNotNull(@class);
 
             return _mapper.Map<ClassDto>(@class);
         }

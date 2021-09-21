@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
+using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Courses.Queries
@@ -27,10 +28,7 @@ namespace Modules.Timetable.Core.Features.Courses.Queries
         public async Task<CourseDto> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
         {
             var course = await _dbContext.Courses.FindAsync(request.Id);
-            if (course == null)
-            {
-                throw new EntityNotFoundException(nameof(Course));
-            }
+            Guard.RequireEntityNotNull(course);
 
             return _mapper.Map<CourseDto>(course);
         }

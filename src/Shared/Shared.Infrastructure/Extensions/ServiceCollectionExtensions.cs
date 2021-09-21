@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Shared.Core.Behaviors;
 using Shared.Infrastructure.Middleware;
 
 namespace Shared.Infrastructure.Extensions
@@ -16,8 +18,6 @@ namespace Shared.Infrastructure.Extensions
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
             
             services.AddLogging();
-
-            services.AddTransient<ExceptionHandlerMiddleware>();
 
             services.AddApiVersioning(o =>
             {
@@ -39,6 +39,8 @@ namespace Shared.Infrastructure.Extensions
 
             services.AddMemoryCache();
             
+            services.RegisterDiServices();
+
             return services;
         }
 
@@ -86,5 +88,11 @@ namespace Shared.Infrastructure.Extensions
         {
             services.AddCors(o => { o.AddDefaultPolicy(pb => { pb.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); }); });
         }
+
+        private static void RegisterDiServices(this IServiceCollection services)
+        {
+            services.AddTransient<ExceptionHandlerMiddleware>();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
+        } 
     }
 }
