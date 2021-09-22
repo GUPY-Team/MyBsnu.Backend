@@ -39,9 +39,11 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
         {
             var schedule = _mapper.Map<Schedule>(request);
 
+            schedule.Version = await GenerateScheduleVersion(schedule, cancellationToken);
+
             await _dbContext.Schedules.AddAsync(schedule, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
+            
             return _mapper.Map<ScheduleDto>(schedule);
         }
 
@@ -90,11 +92,12 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
                 .FirstOrDefaultAsync(cancellationToken);
             Guard.RequireEntityNotNull(schedule);
 
+            var scheduleVersion = await GenerateScheduleVersion(schedule, cancellationToken);
             var copiedSchedule = new Schedule
             {
                 Semester = schedule.Semester,
                 Year = schedule.Year,
-                Version = ++schedule.Version,
+                Version = scheduleVersion,
                 Classes = schedule.Classes.Select(c =>
                 {
                     c.Id = default;
@@ -136,6 +139,17 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<ScheduleDto>(schedule);
+        }
+
+        private async Task<int> GenerateScheduleVersion(Schedule schedule, CancellationToken cancellationToken)
+        {
+            var latestVersion = await _dbContext.Schedules
+                .Where(s => s.Year == schedule.Year && s.Semester == schedule.Semester)
+                .OrderByDescending(s => s.Version)
+                .Select(s => s.Version)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return latestVersion == 0 ? 1 : ++latestVersion;
         }
     }
 }
