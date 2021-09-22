@@ -15,9 +15,10 @@ using Shared.Localization;
 namespace Modules.Timetable.Core.Features.Schedules.Commands
 {
     public class ScheduleCommandHandler
-        : IRequestHandler<UpdateScheduleCommand, ScheduleDto>,
-            IRequestHandler<CopyScheduleCommand, Unit>,
+        : IRequestHandler<CreateScheduleCommand, ScheduleDto>,
+            IRequestHandler<UpdateScheduleCommand, ScheduleDto>,
             IRequestHandler<DeleteScheduleCommand, Unit>,
+            IRequestHandler<CopyScheduleCommand, Unit>,
             IRequestHandler<PublishScheduleCommand, ScheduleDto>
     {
         private readonly IScheduleDbContext _dbContext;
@@ -32,6 +33,19 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
         }
 
         /// <summary>
+        /// Create Schedule 
+        /// </summary>
+        public async Task<ScheduleDto> Handle(CreateScheduleCommand request, CancellationToken cancellationToken)
+        {
+            var schedule = _mapper.Map<Schedule>(request);
+
+            await _dbContext.Schedules.AddAsync(schedule, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return _mapper.Map<ScheduleDto>(schedule);
+        }
+
+        /// <summary>
         /// Update Schedule
         /// </summary>
         public async Task<ScheduleDto> Handle(UpdateScheduleCommand request, CancellationToken cancellationToken)
@@ -43,6 +57,25 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<ScheduleDto>(schedule);
+        }
+
+        /// <summary>
+        /// Delete Schedule
+        /// </summary>
+        public async Task<Unit> Handle(DeleteScheduleCommand request, CancellationToken cancellationToken)
+        {
+            var schedule = await _dbContext.Schedules.FindAsync(request.Id);
+            Guard.RequireEntityNotNull(schedule);
+
+            if (schedule.IsPublished)
+            {
+                throw new EntityNotValidException(_localizer.GetString("errors.DeletePublishedSchedule"));
+            }
+
+            _dbContext.Schedules.Remove(schedule);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
 
         /// <summary>
@@ -72,27 +105,8 @@ namespace Modules.Timetable.Core.Features.Schedules.Commands
             _dbContext.Teachers.AttachRange(schedule.Classes.SelectMany(c => c.Teachers));
             _dbContext.Audiences.AttachRange(schedule.Classes.SelectMany(c => c.Audiences));
             _dbContext.Groups.AttachRange(schedule.Classes.SelectMany(c => c.Groups));
-            
+
             await _dbContext.Schedules.AddAsync(copiedSchedule, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
-        }
-
-        /// <summary>
-        /// Delete Schedule
-        /// </summary>
-        public async Task<Unit> Handle(DeleteScheduleCommand request, CancellationToken cancellationToken)
-        {
-            var schedule = await _dbContext.Schedules.FindAsync(request.Id);
-            Guard.RequireEntityNotNull(schedule);
-
-            if (schedule.IsPublished)
-            {
-                throw new EntityNotValidException(_localizer.GetString("errors.DeletePublishedSchedule"));
-            }
-
-            _dbContext.Schedules.Remove(schedule);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;

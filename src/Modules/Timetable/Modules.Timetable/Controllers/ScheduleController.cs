@@ -25,6 +25,13 @@ namespace Modules.Timetable.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<ScheduleDto>> CreateSchedule([FromBody] CreateScheduleCommand command)
+        {
+            var result = await Mediator.Send(command);
+            return Ok(result);
+        }
+
         [HttpPut]
         public async Task<ActionResult<ScheduleDto>> UpdateSchedule([FromBody] UpdateScheduleCommand command)
         {
@@ -38,9 +45,9 @@ namespace Modules.Timetable.Controllers
             await Mediator.Send(command);
             return NoContent();
         }
-        
-        [HttpPost]
-        public async Task<ActionResult> CopySchedule([FromQuery] CopyScheduleCommand command)
+
+        [HttpPost("{SourceId:min(1)}/copy")]
+        public async Task<ActionResult> CopySchedule([FromRoute] CopyScheduleCommand command)
         {
             await Mediator.Send(command);
             return NoContent();

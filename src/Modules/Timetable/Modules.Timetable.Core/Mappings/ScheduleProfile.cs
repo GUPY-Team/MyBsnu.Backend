@@ -9,6 +9,7 @@ namespace Modules.Timetable.Core.Mappings
     {
         public ScheduleProfile()
         {
+            CreateMap<CreateScheduleCommand, Schedule>();
             CreateMap<UpdateScheduleCommand, Schedule>();
             CreateMap<Schedule, ScheduleDto>();
         }
