@@ -64,7 +64,7 @@ namespace Modules.Identity.Core.Features.User
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             userClaims.Add(new Claim("email", user.Email));
-            userClaims.Add(new Claim("username", user.UserName));
+            userClaims.Add(new Claim("userName", user.UserName));
 
             var token = _tokenService.CreateToken(userClaims);
 
