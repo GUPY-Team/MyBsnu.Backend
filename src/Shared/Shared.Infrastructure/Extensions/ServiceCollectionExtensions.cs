@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Shared.Core.Behaviors;
 using Shared.Infrastructure.Middleware;
@@ -13,7 +14,7 @@ namespace Shared.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSharedServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddSharedServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
             
@@ -33,13 +34,16 @@ namespace Shared.Infrastructure.Extensions
 
             services.AddLocalization(o => o.ResourcesPath = "Resources");
 
-            services.AddSwagger();
+            if (environment.IsDevelopment())
+            {
+                services.AddSwagger();
+            }
 
             services.AddCorsPolicy();
 
             services.AddMemoryCache();
             
-            services.RegisterDiServices();
+            services.RegisterServices();
 
             return services;
         }
@@ -47,7 +51,15 @@ namespace Shared.Infrastructure.Extensions
         public static IServiceCollection AddDatabaseContext<T>(this IServiceCollection services, IConfiguration configuration)
             where T : DbContext
         {
-            services.AddDbContext<T>(o => { o.UseNpgsql(configuration.GetConnectionString("postgres")); });
+            services.AddDbContext<T>(o =>
+            {
+                o.UseNpgsql(configuration.GetConnectionString("postgres"));
+            });
+
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<T>();
+            dbContext.Database.Migrate();
+
             return services;
         }
 
@@ -89,7 +101,7 @@ namespace Shared.Infrastructure.Extensions
             services.AddCors(o => { o.AddDefaultPolicy(pb => { pb.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); }); });
         }
 
-        private static void RegisterDiServices(this IServiceCollection services)
+        private static void RegisterServices(this IServiceCollection services)
         {
             services.AddTransient<ExceptionHandlerMiddleware>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));

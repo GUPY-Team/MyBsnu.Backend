@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace Modules.Identity.Core.Abstractions
 {
-    public interface ITokenService
+    public interface IJwtTokenService
     {
         string CreateToken(IEnumerable<Claim> userClaims);
     }

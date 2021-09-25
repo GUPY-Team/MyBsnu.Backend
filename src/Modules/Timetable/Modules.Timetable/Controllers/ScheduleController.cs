@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Schedules.Commands;
 using Modules.Timetable.Core.Features.Schedules.Queries;
+using Shared.Core.Constants;
 using Shared.DTO;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
@@ -9,6 +11,7 @@ using Shared.Infrastructure.Controllers;
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
+    [Authorize(Policy = Permissions.CanManageSchedule)]
     public class ScheduleController : ApiControllerBase
     {
         [HttpGet]

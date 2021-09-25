@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Shared.Infrastructure.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class ApiControllerBase : ControllerBase
     {

@@ -10,11 +10,11 @@ using Modules.Identity.Core.Settings;
 
 namespace Modules.Identity.Core.Features.User
 {
-    public class TokenService : ITokenService
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly JwtSettings _jwtSettings;
 
-        public TokenService(IOptions<JwtSettings> jwtSettings)
+        public JwtTokenService(IOptions<JwtSettings> jwtSettings)
         {
             _jwtSettings = jwtSettings.Value;
         }

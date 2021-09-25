@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Entities;
 using Modules.Identity.Core.Settings;
+using Modules.Identity.Infrastructure.Permissions;
 using Shared.Infrastructure.Extensions;
 using IdentityDbContext = Modules.Identity.Infrastructure.Persistence.IdentityDbContext;
 
@@ -15,29 +19,45 @@ namespace Modules.Identity.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddIdentityInfrastructure(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            IHostEnvironment environment)
         {
             services
                 .AddDatabaseContext<IdentityDbContext>(configuration)
                 .AddScoped<IIdentityDbContext>(p => p.GetService<IdentityDbContext>())
                 .AddIdentity<AppUser, AppRole>(o =>
                 {
-                    o.Password.RequiredLength = 6;
-                    o.Password.RequireDigit = false;
-                    o.Password.RequireLowercase = false;
-                    o.Password.RequireNonAlphanumeric = false;
-                    o.Password.RequireUppercase = false;
+                    if (environment.IsDevelopment())
+                    {
+                        o.Password.RequireDigit = false;
+                        o.Password.RequireLowercase = false;
+                        o.Password.RequireNonAlphanumeric = false;
+                        o.Password.RequireUppercase = false;
+                    }
+
                     o.User.RequireUniqueEmail = true;
                 })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddJwtAuth(configuration);
+            services.AddPermissions();
+            services.AddJwtAuth(configuration, environment);
 
             return services;
         }
 
-        private static IServiceCollection AddJwtAuth(this IServiceCollection services, IConfiguration configuration)
+        private static void AddPermissions(this IServiceCollection services)
+        {
+            services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        }
+
+        private static void AddJwtAuth(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            IHostEnvironment environment)
         {
             var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
 
@@ -48,7 +68,11 @@ namespace Modules.Identity.Infrastructure.Extensions
                 })
                 .AddJwtBearer(o =>
                 {
-                    o.RequireHttpsMetadata = false;
+                    if (environment.IsDevelopment())
+                    {
+                        o.RequireHttpsMetadata = false;
+                    }
+
                     o.SaveToken = true;
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -59,8 +83,6 @@ namespace Modules.Identity.Infrastructure.Extensions
                         ClockSkew = TimeSpan.Zero
                     };
                 });
-
-            return services;
         }
     }
 }

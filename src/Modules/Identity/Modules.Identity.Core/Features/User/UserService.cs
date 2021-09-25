@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -17,20 +16,20 @@ namespace Modules.Identity.Core.Features.User
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly ITokenService _tokenService;
+        private readonly IJwtTokenService _jwtTokenService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer<Locale> _localizer;
 
         public UserService(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            ITokenService tokenService,
+            IJwtTokenService jwtTokenService,
             IMapper mapper,
             IStringLocalizer<Locale> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _tokenService = tokenService;
+            _jwtTokenService = jwtTokenService;
             _mapper = mapper;
             _localizer = localizer;
         }
@@ -40,6 +39,11 @@ namespace Modules.Identity.Core.Features.User
             var user = _mapper.Map<AppUser>(request);
 
             var result = await _userManager.CreateAsync(user, request.Password);
+            await _userManager.AddClaimsAsync(user, new[]
+            {
+                new Claim("email", user.Email),
+                new Claim("userName", user.UserName)
+            });
 
             if (!result.Succeeded)
             {
@@ -62,11 +66,7 @@ namespace Modules.Identity.Core.Features.User
             }
 
             var userClaims = await _userManager.GetClaimsAsync(user);
-
-            userClaims.Add(new Claim("email", user.Email));
-            userClaims.Add(new Claim("userName", user.UserName));
-
-            var token = _tokenService.CreateToken(userClaims);
+            var token = _jwtTokenService.CreateToken(userClaims);
 
             return new UserSignedInResponse
             {

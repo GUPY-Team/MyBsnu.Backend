@@ -16,7 +16,7 @@ namespace Modules.Identity.Core.Extensions
                 .AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly)
                 .AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly)
                 .AddScoped<IUserService, UserService>()
-                .AddScoped<ITokenService, TokenService>();
+                .AddScoped<IJwtTokenService, JwtTokenService>();
             return services;
         }
     }

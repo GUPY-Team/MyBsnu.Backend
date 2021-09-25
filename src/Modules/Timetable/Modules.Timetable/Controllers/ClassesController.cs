@@ -1,16 +1,20 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Classes.Commands;
 using Modules.Timetable.Core.Features.Classes.Queries;
+using Shared.Core.Constants;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
+    [Authorize(Policy = Permissions.CanManageClasses)]
     public class ClassesController : ApiControllerBase
     {
         [HttpGet("{Id:min(1)}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ClassDto>> GetClass([FromRoute] GetClassByIdQuery query)
         {
             var result = await Mediator.Send(query);

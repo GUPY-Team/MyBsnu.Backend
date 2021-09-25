@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Identity.Core.Abstractions;
 using Shared.DTO.Identity;
@@ -7,6 +8,7 @@ using Shared.Infrastructure.Controllers;
 namespace Modules.Identity.Controllers
 {
     [ApiVersion("1.0")]
+    [AllowAnonymous]
     public class AuthController : ApiControllerBase
     {
         private readonly IUserService _userService;
