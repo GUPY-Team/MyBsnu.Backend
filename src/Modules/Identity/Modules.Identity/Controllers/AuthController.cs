@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Identity.Core.Abstractions;
+using Modules.Identity.Core.Features.Auth.Commands;
 using Shared.DTO.Identity;
 using Shared.Infrastructure.Controllers;
 
@@ -11,24 +12,17 @@ namespace Modules.Identity.Controllers
     [AllowAnonymous]
     public class AuthController : ApiControllerBase
     {
-        private readonly IUserService _userService;
-
-        public AuthController(IUserService userService)
-        {
-            _userService = userService;
-        }
-
         [HttpPost("signup")]
-        public async Task<ActionResult> Signup([FromBody] SignupUserRequest request)
+        public async Task<ActionResult> Signup([FromBody] SignupUserCommand command)
         {
-            await _userService.SignupUser(request);
+            await Mediator.Send(command);
             return Ok();
         }
 
         [HttpPost("signin")]
-        public async Task<ActionResult> Signin([FromBody] SigninUserRequest request)
+        public async Task<ActionResult> Signin([FromBody] SigninUserCommand command)
         {
-            var result = await _userService.SigninUser(request);
+            var result = await Mediator.Send(command);
             return Ok(result);
         }
     }

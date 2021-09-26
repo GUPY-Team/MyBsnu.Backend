@@ -24,7 +24,7 @@
         <value>Аудиторії: {0} зайняті</value>
     </data>
     <data name="errors.TeachersBusy" xml:space="preserve">
-        <value>Вчителі: {0} вже ведуть пару у цей час</value>
+        <value>Викладачі: {0} вже ведуть пару у цей час</value>
     </data>
     <data name="errors.GroupsBusy" xml:space="preserve">
         <value>Групи: {0} вже мають пару у цей час</value>
@@ -40,5 +40,14 @@
     </data>
     <data name="errors.UnableToSignup" xml:space="preserve">
         <value>Неможливо зареєструвати користувача: {0}</value>
+    </data>
+    <data name="errors.UnableToCreateUser" xml:space="preserve">
+        <value>Неможливо створити користувача: {0}</value>
+    </data>
+    <data name="errors.UnableToRemoveClaims" xml:space="preserve">
+        <value>Неможливо видалити дозволи: {0}</value>
+    </data>
+    <data name="errors.InvalidClaims" xml:space="preserve">
+        <value>Дозволи {0} не існують</value>
     </data>
 </root>

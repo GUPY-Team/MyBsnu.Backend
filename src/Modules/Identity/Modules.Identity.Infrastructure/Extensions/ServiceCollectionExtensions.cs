@@ -12,6 +12,7 @@ using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Entities;
 using Modules.Identity.Core.Settings;
 using Modules.Identity.Infrastructure.Permissions;
+using Modules.Identity.Infrastructure.Services;
 using Shared.Infrastructure.Extensions;
 using IdentityDbContext = Modules.Identity.Infrastructure.Persistence.IdentityDbContext;
 
@@ -41,6 +42,8 @@ namespace Modules.Identity.Infrastructure.Extensions
                 })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             services.AddPermissions();
             services.AddJwtAuth(configuration, environment);

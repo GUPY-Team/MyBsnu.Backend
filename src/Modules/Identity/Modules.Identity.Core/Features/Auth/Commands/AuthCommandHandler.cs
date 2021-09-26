@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Localization;
 using Modules.Identity.Core.Abstractions;
@@ -10,9 +12,11 @@ using Modules.Identity.Core.Exceptions;
 using Shared.DTO.Identity;
 using Shared.Localization;
 
-namespace Modules.Identity.Core.Features.User
+namespace Modules.Identity.Core.Features.Auth.Commands
 {
-    public class UserService : IUserService
+    public class AuthCommandHandler
+        : IRequestHandler<SigninUserCommand, UserSignedInResponse>,
+            IRequestHandler<SignupUserCommand, Unit>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
@@ -20,7 +24,7 @@ namespace Modules.Identity.Core.Features.User
         private readonly IMapper _mapper;
         private readonly IStringLocalizer<Locale> _localizer;
 
-        public UserService(
+        public AuthCommandHandler(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             IJwtTokenService jwtTokenService,
@@ -34,24 +38,7 @@ namespace Modules.Identity.Core.Features.User
             _localizer = localizer;
         }
 
-        public async Task SignupUser(SignupUserRequest request)
-        {
-            var user = _mapper.Map<AppUser>(request);
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-            await _userManager.AddClaimsAsync(user, new[]
-            {
-                new Claim("email", user.Email),
-                new Claim("userName", user.UserName)
-            });
-
-            if (!result.Succeeded)
-            {
-                throw new IdentityException(_localizer.GetString("errors.UnableToSignup", result.Errors.First().Description));
-            }
-        }
-
-        public async Task<UserSignedInResponse> SigninUser(SigninUserRequest request)
+        public async Task<UserSignedInResponse> Handle(SigninUserCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
@@ -74,6 +61,25 @@ namespace Modules.Identity.Core.Features.User
                 Email = user.Email,
                 Token = token
             };
+        }
+
+        public async Task<Unit> Handle(SignupUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = _mapper.Map<AppUser>(request);
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            await _userManager.AddClaimsAsync(user, new[]
+            {
+                new Claim("email", user.Email),
+                new Claim("userName", user.UserName)
+            });
+
+            if (!result.Succeeded)
+            {
+                throw new IdentityException(_localizer.GetString("errors.UnableToSignup", result.Errors.First().Description));
+            }
+
+            return Unit.Value;
         }
     }
 }

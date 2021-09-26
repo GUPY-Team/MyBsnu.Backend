@@ -48,4 +48,13 @@
     <data name="errors.UnableToSignup" xml:space="preserve">
         <value>Unable to signup user: {0}</value>
     </data>
+    <data name="errors.UnableToCreateUser" xml:space="preserve">
+        <value>Unable to create user: {0}</value>
+    </data>
+    <data name="errors.UnableToRemoveClaims" xml:space="preserve">
+        <value>Unable to remove claims: {0}</value>
+    </data>
+    <data name="errors.InvalidClaims" xml:space="preserve">
+        <value>Claims {0} are invalid</value>
+    </data>
 </root>

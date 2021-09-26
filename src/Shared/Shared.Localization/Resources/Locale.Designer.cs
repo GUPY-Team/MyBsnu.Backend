@@ -106,6 +106,15 @@ namespace Shared.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Claims {0} are invalid.
+        /// </summary>
+        internal static string errors_InvalidClaims {
+            get {
+                return ResourceManager.GetString("errors.InvalidClaims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid password or email.
         /// </summary>
         internal static string errors_InvalidCredentials {
@@ -138,6 +147,24 @@ namespace Shared.Localization.Resources {
         internal static string errors_TeachersBusy {
             get {
                 return ResourceManager.GetString("errors.TeachersBusy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to create user: {0}.
+        /// </summary>
+        internal static string errors_UnableToCreateUser {
+            get {
+                return ResourceManager.GetString("errors.UnableToCreateUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to remove claims: {0}.
+        /// </summary>
+        internal static string errors_UnableToRemoveClaims {
+            get {
+                return ResourceManager.GetString("errors.UnableToRemoveClaims", resourceCulture);
             }
         }
         

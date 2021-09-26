@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Settings;
 
-namespace Modules.Identity.Core.Features.User
+namespace Modules.Identity.Infrastructure.Services
 {
     public class JwtTokenService : IJwtTokenService
     {

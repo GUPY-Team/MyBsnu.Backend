@@ -1,8 +1,7 @@
 ﻿using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Modules.Identity.Core.Abstractions;
-using Modules.Identity.Core.Features.User;
 using Modules.Identity.Core.Settings;
 
 namespace Modules.Identity.Core.Extensions
@@ -13,10 +12,9 @@ namespace Modules.Identity.Core.Extensions
         {
             services
                 .Configure<JwtSettings>(configuration.GetSection("Jwt"))
+                .AddMediatR(typeof(ServiceCollectionExtensions).Assembly)
                 .AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly)
-                .AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly)
-                .AddScoped<IUserService, UserService>()
-                .AddScoped<IJwtTokenService, JwtTokenService>();
+                .AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
             return services;
         }
     }

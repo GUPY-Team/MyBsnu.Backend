@@ -36,9 +36,18 @@
         <value>Рассписание уже опубликовано</value>
     </data>
     <data name="errors.TeachersBusy" xml:space="preserve">
-        <value>Учителя: {0} уже ведут пару в заданое время</value>
+        <value>Преподаватели: {0} уже ведут пару в заданое время</value>
     </data>
     <data name="errors.UnableToSignup" xml:space="preserve">
         <value>Незвомжно зарегестрировать пользователя: {0}</value>
+    </data>
+    <data name="errors.UnableToCreateUser" xml:space="preserve">
+        <value>Невозможно создать пользователя: {0}</value>
+    </data>
+    <data name="errors.UnableToRemoveClaims" xml:space="preserve">
+        <value>Невозможно удалить разрешения: {0}</value>
+    </data>
+    <data name="errors.InvalidClaims" xml:space="preserve">
+        <value>Разрешения {0} не существуют</value>
     </data>
 </root>

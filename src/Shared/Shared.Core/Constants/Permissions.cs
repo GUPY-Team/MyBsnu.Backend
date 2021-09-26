@@ -1,4 +1,7 @@
-﻿namespace Shared.Core.Constants
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+
+namespace Shared.Core.Constants
 {
     public static class Permissions
     {
@@ -10,8 +13,18 @@
         public const string CanManageTeachers = "Permissions.CanManageTeachers";
 
         public const string SuperAdmin = "Permissions.SuperAdmin";
-        
+
         public const string PermissionsPrefix = "Permissions";
         public const string PermissionsClaimType = "permission";
+
+        public static readonly ImmutableHashSet<string> All =
+            ImmutableHashSet.Create(
+                CanManageAudiences,
+                CanManageClasses,
+                CanManageCourses,
+                CanManageGroups,
+                CanManageSchedule,
+                CanManageTeachers,
+                SuperAdmin);
     }
 }
