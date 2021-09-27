@@ -46,7 +46,7 @@ namespace Modules.Identity.Core.Features.Users.Commands
 
         public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByIdAsync(request.Id);
             Guard.RequireEntityNotNull(user);
 
             await _userManager.DeleteAsync(user);

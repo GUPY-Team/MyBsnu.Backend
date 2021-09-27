@@ -17,14 +17,16 @@ namespace Shared.Core.Constants
         public const string PermissionsPrefix = "Permissions";
         public const string PermissionsClaimType = "permission";
 
-        public static readonly ImmutableHashSet<string> All =
-            ImmutableHashSet.Create(
+        public static readonly IReadOnlySet<string> All =
+            new HashSet<string>
+            {
                 CanManageAudiences,
                 CanManageClasses,
                 CanManageCourses,
                 CanManageGroups,
                 CanManageSchedule,
                 CanManageTeachers,
-                SuperAdmin);
+                SuperAdmin
+            };
     }
 }

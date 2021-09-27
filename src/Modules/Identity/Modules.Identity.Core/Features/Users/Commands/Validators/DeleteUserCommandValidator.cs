@@ -6,7 +6,7 @@ namespace Modules.Identity.Core.Features.Users.Commands.Validators
     {
         public DeleteUserCommandValidator()
         {
-            RuleFor(c => c.UserId).NotEmpty();
+            RuleFor(c => c.Id).NotEmpty();
         }
     }
 }
