@@ -15,9 +15,9 @@ namespace Modules.Identity.Controllers
     public class UsersController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<List<AppUserListDto>>> GetUsers()
+        public async Task<ActionResult<List<AppUserListDto>>> GetUsers([FromQuery] GetUsersQuery query)
         {
-            var result = await Mediator.Send(new GetUsersQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 
