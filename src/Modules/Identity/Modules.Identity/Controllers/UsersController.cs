@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Identity.Core.Features.Users.Commands;
 using Modules.Identity.Core.Features.Users.Queries;
 using Shared.Core.Constants;
+using Shared.DTO;
 using Shared.DTO.Identity;
 using Shared.Infrastructure.Controllers;
 
@@ -15,7 +16,7 @@ namespace Modules.Identity.Controllers
     public class UsersController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<List<AppUserListDto>>> GetUsers([FromQuery] GetUsersQuery query)
+        public async Task<ActionResult<PagedList<AppUserListDto>>> GetUsers([FromQuery] GetUsersQuery query)
         {
             var result = await Mediator.Send(query);
             return Ok(result);

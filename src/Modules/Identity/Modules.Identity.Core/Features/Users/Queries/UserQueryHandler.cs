@@ -9,13 +9,15 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Identity.Core.Entities;
 using Shared.Core.Extensions;
 using Shared.Core.Helpers;
+using Shared.DTO;
 using Shared.DTO.Identity;
+using Shared.DTO.Schedule;
 
 namespace Modules.Identity.Core.Features.Users.Queries
 {
     public class UserQueryHandler
         : IRequestHandler<GetUserByIdQuery, AppUserDto>,
-            IRequestHandler<GetUsersQuery, List<AppUserListDto>>
+            IRequestHandler<GetUsersQuery, PagedList<AppUserListDto>>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
@@ -41,13 +43,16 @@ namespace Modules.Identity.Core.Features.Users.Queries
             };
         }
 
-        public async Task<List<AppUserListDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+        public async Task<PagedList<AppUserListDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
         {
             var users = await _userManager.Users
                 .AsNoTracking()
                 .Paginate(request.Page, request.PageSize)
                 .ToListAsync(cancellationToken);
-            return _mapper.Map<List<AppUserListDto>>(users);
+            var totalCount = await _userManager.Users.CountAsync(cancellationToken);
+
+            var mappedItems = _mapper.Map<List<AppUserListDto>>(users);
+            return new PagedList<AppUserListDto>(mappedItems, request.Page, request.PageSize, totalCount);
         }
     }
 }
