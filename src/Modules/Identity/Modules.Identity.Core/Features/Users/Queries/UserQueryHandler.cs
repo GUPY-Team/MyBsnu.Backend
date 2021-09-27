@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Modules.Identity.Core.Entities;
+using Shared.Core.Extensions;
 using Shared.Core.Helpers;
 using Shared.DTO.Identity;
 
@@ -27,7 +28,7 @@ namespace Modules.Identity.Core.Features.Users.Queries
 
         public async Task<AppUserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByIdAsync(request.Id);
             Guard.RequireEntityNotNull(user);
 
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -42,7 +43,10 @@ namespace Modules.Identity.Core.Features.Users.Queries
 
         public async Task<List<AppUserListDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
         {
-            var users = await _userManager.Users.ToListAsync(cancellationToken);
+            var users = await _userManager.Users
+                .AsNoTracking()
+                .Paginate(request.Page, request.PageSize)
+                .ToListAsync(cancellationToken);
             return _mapper.Map<List<AppUserListDto>>(users);
         }
     }

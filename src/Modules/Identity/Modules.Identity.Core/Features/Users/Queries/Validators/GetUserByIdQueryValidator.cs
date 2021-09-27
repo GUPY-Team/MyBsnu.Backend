@@ -6,7 +6,7 @@ namespace Modules.Identity.Core.Features.Users.Queries.Validators
     {
         public GetUserByIdQueryValidator()
         {
-            RuleFor(q => q.UserId).NotEmpty();
+            RuleFor(q => q.Id).NotEmpty();
         }
     }
 }
