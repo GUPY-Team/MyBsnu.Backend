@@ -43,6 +43,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             var schedule = await GetGroupSchedule(request.GroupId)
                 .Where(s => s.IsPublished)
                 .FirstOrDefaultAsync(cancellationToken);
+            Guard.RequireEntityNotNull(schedule);
 
             return new GroupScheduleDto
             {
