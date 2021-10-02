@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.Specification.EntityFrameworkCore;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
+using Modules.Timetable.Core.Specifications;
 using Shared.Core.Domain;
 using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
@@ -93,7 +97,9 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
 
         private async Task ValidateClass(Class @class, CancellationToken cancellationToken)
         {
-            var overlaps = await GetOverlappingClassesWith(@class).ToListAsync(cancellationToken);
+            var overlaps = await _dbContext.Classes
+                .WithSpecification(new OverlappingScheduleClassesSpecification(@class))
+                .ToListAsync(cancellationToken);
 
             foreach (var overlap in overlaps)
             {
@@ -118,27 +124,6 @@ namespace Modules.Timetable.Core.Features.Classes.Commands
                     throw new EntityNotValidException(message);
                 }
             }
-        }
-
-        private IQueryable<Class> GetOverlappingClassesWith(Class @class)
-        {
-            var baseQuery = _dbContext.Classes
-                .Where(c => c.Id != @class.Id)
-                .Where(c => c.ScheduleId == @class.ScheduleId)
-                .Where(c => c.StartTime == @class.StartTime)
-                .Where(c => c.WeekDay == @class.WeekDay)
-                .Where(c =>
-                    c.Teachers.Any(t => @class.Teachers.Select(x => x.Id).Contains(t.Id)) ||
-                    c.Audiences.Any(t => @class.Audiences.Select(x => x.Id).Contains(t.Id)) ||
-                    c.Groups.Any(t => @class.Groups.Select(x => x.Id).Contains(t.Id))
-                );
-
-            if (@class.WeekType != null)
-            {
-                baseQuery = baseQuery.Where(c => c.WeekType == null || c.WeekType == @class.WeekType);
-            }
-
-            return baseQuery;
         }
     }
 }

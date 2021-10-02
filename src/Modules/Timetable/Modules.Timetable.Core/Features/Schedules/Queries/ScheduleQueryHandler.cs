@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.Specification.EntityFrameworkCore;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
-using Shared.Core.Domain;
+using Modules.Timetable.Core.Specifications;
 using Shared.Core.Extensions;
 using Shared.Core.Helpers;
 using Shared.DTO;
@@ -40,8 +41,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             var group = await _dbContext.Groups.FindAsync(request.GroupId);
             Guard.RequireEntityNotNull(group);
 
-            var schedule = await GetGroupSchedule(request.GroupId)
-                .Where(s => s.IsPublished)
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .WithSpecification(new LatestGroupScheduleSpecification(request.GroupId))
                 .FirstOrDefaultAsync(cancellationToken);
             Guard.RequireEntityNotNull(schedule);
 
@@ -60,9 +62,7 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
         {
             var scheduleList = await _dbContext.Schedules
                 .AsNoTracking()
-                .OrderByDescending(s => s.Year)
-                .ThenByDescending(s => s.Semester)
-                .ThenByDescending(s => s.Version)
+                .WithSpecification(new ScheduleListSpecification())
                 .Paginate(request.Page, request.PageSize)
                 .ToListAsync(cancellationToken);
             var totalItems = await _dbContext.Schedules.CountAsync(cancellationToken);
@@ -90,7 +90,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             var group = await _dbContext.Groups.FindAsync(request.GroupId);
             Guard.RequireEntityNotNull(group);
 
-            var schedule = await GetGroupSchedule(request.GroupId)
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .WithSpecification(new GroupScheduleSpecification(request.GroupId))
                 .Where(s => s.Id == request.ScheduleId)
                 .FirstOrDefaultAsync(cancellationToken);
             Guard.RequireEntityNotNull(schedule);
@@ -111,8 +113,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             var teacher = await _dbContext.Teachers.FindAsync(request.TeacherId);
             Guard.RequireEntityNotNull(teacher);
 
-            var schedule = await GetTeacherSchedule(teacher.Id)
-                .Where(s => s.IsPublished)
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .WithSpecification(new LatestTeacherScheduleSpecification(request.TeacherId))
                 .FirstOrDefaultAsync(cancellationToken);
             Guard.RequireEntityNotNull(schedule);
 
@@ -132,7 +135,9 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
                 .SingleOrDefaultAsync(t => t.Id == request.TeacherId, cancellationToken);
             Guard.RequireEntityNotNull(teacher);
 
-            var schedule = await GetTeacherSchedule(teacher.Id)
+            var schedule = await _dbContext.Schedules
+                .AsNoTracking()
+                .WithSpecification(new TeacherScheduleSpecification(request.TeacherId))
                 .Where(s => s.Id == request.ScheduleId)
                 .FirstOrDefaultAsync(cancellationToken);
             Guard.RequireEntityNotNull(schedule);
@@ -141,29 +146,6 @@ namespace Modules.Timetable.Core.Features.Schedules.Queries
             {
                 Classes = MapToScheduleClasses(schedule.Classes)
             };
-        }
-
-        private IQueryable<Schedule> GetTeacherSchedule(int teacherId)
-        {
-            return _dbContext.Schedules
-                .AsNoTracking()
-                .Include(s => s.Classes
-                    .Where(c => c.Teachers
-                        .Select(t => t.Id)
-                        .Contains(teacherId)
-                    )
-                );
-        }
-
-        private IQueryable<Schedule> GetGroupSchedule(int groupId)
-        {
-            return _dbContext.Schedules
-                .AsNoTracking()
-                .Include(s => s.Classes
-                    .Where(c => c.Groups
-                        .Any(cg => cg.Id == groupId)
-                    )
-                );
         }
 
         private Dictionary<string, ClassDto[]> MapToScheduleClasses(IEnumerable<Class> classes)

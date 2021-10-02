@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.Specification.EntityFrameworkCore;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +11,6 @@ using Shared.Core.Extensions;
 using Shared.Core.Helpers;
 using Shared.DTO;
 using Shared.DTO.Identity;
-using Shared.DTO.Schedule;
 
 namespace Modules.Identity.Core.Features.Users.Queries
 {
