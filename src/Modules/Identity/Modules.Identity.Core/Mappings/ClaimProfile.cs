@@ -8,7 +8,7 @@ namespace Modules.Identity.Core.Mappings
     {
         public ClaimProfile()
         {
-            CreateMap<Claim, ClaimDto>();
+            CreateMap<Claim, ClaimDto>().ReverseMap();
         }
     }
 }

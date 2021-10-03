@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,13 +36,19 @@ namespace Modules.Identity.Core.Features.Users.Commands
             var user = _mapper.Map<AppUser>(request);
 
             var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return Unit.Value;
+                var error = result.Errors.First().Description;
+                throw new IdentityException(_localizer.GetString("errors.UnableToCreateUser", error));
             }
 
-            var error = result.Errors.First().Description;
-            throw new IdentityException(_localizer.GetString("errors.UnableToCreateUser", error));
+            await _userManager.AddClaimsAsync(user, new[]
+            {
+                new Claim("email", user.Email),
+                new Claim("userName", user.UserName)
+            });
+            
+            return Unit.Value;
         }
 
         public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
@@ -56,18 +63,23 @@ namespace Modules.Identity.Core.Features.Users.Commands
 
         public async Task<Unit> Handle(UpdateUserClaimsCommand request, CancellationToken cancellationToken)
         {
-            if (!Permissions.All.IsSupersetOf(request.Claims))
+            var claimsToCheck = request.Claims
+                .Select(c => $"{Permissions.PermissionsPrefix}.{c.Value}")
+                .ToArray();
+            if (!Permissions.All.IsSupersetOf(claimsToCheck))
             {
-                var invalidClaims = request.Claims.ToHashSet();
+                var invalidClaims = claimsToCheck.ToHashSet();
                 invalidClaims.ExceptWith(Permissions.All);
 
-                throw new IdentityException(_localizer.GetString("errors.InvalidClaims", invalidClaims));
+                var claimsString = string.Join(", ", invalidClaims);
+                throw new IdentityException(_localizer.GetString("errors.InvalidClaims", claimsString));
             }
 
             var user = await _userManager.FindByIdAsync(request.UserId);
             Guard.RequireEntityNotNull(user);
 
-            var claims = await _userManager.GetClaimsAsync(user);
+            var claims = (await _userManager.GetClaimsAsync(user))
+                .Where(c => c.Type == Permissions.PermissionsClaimType);
 
             var result = await _userManager.RemoveClaimsAsync(user, claims);
             if (!result.Succeeded)
@@ -76,9 +88,7 @@ namespace Modules.Identity.Core.Features.Users.Commands
                 throw new IdentityException(_localizer.GetString("errors.UnableToRemoveClaims", error));
             }
 
-            var claimsToAdd = request.Claims.Select(s =>
-                new Claim(Permissions.PermissionsClaimType, s.Replace($"{Permissions.PermissionsPrefix}.", ""))
-            );
+            var claimsToAdd = _mapper.Map<List<Claim>>(request.Claims);
 
             await _userManager.AddClaimsAsync(user, claimsToAdd);
 

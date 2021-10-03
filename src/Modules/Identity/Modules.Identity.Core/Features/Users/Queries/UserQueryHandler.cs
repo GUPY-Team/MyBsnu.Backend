@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.Specification.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Modules.Identity.Core.Entities;
+using Shared.Core.Constants;
 using Shared.Core.Extensions;
 using Shared.Core.Helpers;
 using Shared.DTO;
@@ -32,10 +34,12 @@ namespace Modules.Identity.Core.Features.Users.Queries
             var user = await _userManager.FindByIdAsync(request.Id);
             Guard.RequireEntityNotNull(user);
 
-            var userClaims = await _userManager.GetClaimsAsync(user);
+            var userClaims = (await _userManager.GetClaimsAsync(user))
+                .Where(c => c.Type == Permissions.PermissionsClaimType);
 
             return new AppUserDto
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
                 Claims = _mapper.Map<List<ClaimDto>>(userClaims)
