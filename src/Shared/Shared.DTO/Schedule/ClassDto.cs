@@ -12,8 +12,8 @@ namespace Shared.DTO.Schedule
         public string StartTime { get; init; }
         public string EndTime { get; init; }
         public string Duration { get; init; }
-        public string CourseName { get; init; }
-        public int CourseId { get; init; }
+
+        public CourseDto Course { get; init; }
 
         public int ScheduleId { get; init; }
 

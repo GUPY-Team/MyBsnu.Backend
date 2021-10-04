@@ -8,5 +8,7 @@ namespace Modules.Timetable.Core.Features.Courses.Commands
         public int Id { get; init; }
         
         public string Name { get; init; }
+
+        public string ShortName { get; init; }
     }
 }

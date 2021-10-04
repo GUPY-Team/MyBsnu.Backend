@@ -5,5 +5,6 @@ namespace Modules.Timetable.Core.Entities
     public class Course : Entity<int>
     {
         public string Name { get; set; }
+        public string ShortName { get; set; }
     }
 }
