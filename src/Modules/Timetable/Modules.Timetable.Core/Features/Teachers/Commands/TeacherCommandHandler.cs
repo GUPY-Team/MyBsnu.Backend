@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
@@ -50,6 +51,12 @@ namespace Modules.Timetable.Core.Features.Teachers.Commands
         {
             var teacher = await _dbContext.Teachers.FindAsync(request.Id);
             Guard.RequireEntityNotNull(teacher);
+
+            var teacherInUse = await _dbContext.Classes.AnyAsync(c => c.Teachers.Contains(teacher), cancellationToken);
+            if (teacherInUse)
+            {
+                throw new EntityCascadeDeleteRestricted(nameof(Teacher));
+            }
 
             _dbContext.Teachers.Remove(teacher);
             await _dbContext.SaveChangesAsync(cancellationToken);

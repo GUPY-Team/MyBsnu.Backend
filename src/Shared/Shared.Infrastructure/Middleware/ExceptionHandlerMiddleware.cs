@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Ardalis.SmartEnum;
@@ -16,7 +17,8 @@ namespace Shared.Infrastructure.Middleware
         private readonly ILogger<ExceptionHandlerMiddleware> _logger;
         private readonly IStringLocalizer<Locale> _localizer;
 
-        public ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger, IStringLocalizer<Locale> localizer)
+        public ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger,
+            IStringLocalizer<Locale> localizer)
         {
             _logger = logger;
             _localizer = localizer;
@@ -51,9 +53,15 @@ namespace Shared.Infrastructure.Middleware
                     Message = _localizer.GetString("errors.NotFound", e.EntityName),
                     Status = (int) HttpStatusCode.NotFound
                 },
-                EntityNotValidException e => new ApiError { Message = e.Message, Errors = e.Errors, Status = (int) HttpStatusCode.BadRequest },
-                DomainException e => new ApiError { Message = e.Message, Status = (int) HttpStatusCode.BadRequest },
-                SmartEnumNotFoundException e => new ApiError
+                EntityNotValidException e => new ApiError
+                    {Message = e.Message, Errors = e.Errors, Status = (int) HttpStatusCode.BadRequest},
+                EntityCascadeDeleteRestricted e => new ApiError
+                {
+                    Message = _localizer.GetString("errors.CascadeDeleteRestricted", e.EntityName),
+                    Status = (int) HttpStatusCode.BadRequest
+                },
+                DomainException e => new ApiError {Message = e.Message, Status = (int) HttpStatusCode.BadRequest},
+                SmartEnumNotFoundException => new ApiError
                 {
                     Message = _localizer.GetString("errors.EnumNotFound"),
                     Status = (int) HttpStatusCode.BadRequest

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
@@ -50,6 +51,13 @@ namespace Modules.Timetable.Core.Features.Audiences.Commands
         {
             var audience = await _dbContext.Audiences.FindAsync(request.Id);
             Guard.RequireEntityNotNull(audience);
+
+            var audienceInUse =
+                await _dbContext.Classes.AnyAsync(c => c.Audiences.Contains(audience), cancellationToken);
+            if (audienceInUse)
+            {
+                throw new EntityCascadeDeleteRestricted(nameof(Audience));
+            }
 
             _dbContext.Audiences.Remove(audience);
             await _dbContext.SaveChangesAsync(cancellationToken);

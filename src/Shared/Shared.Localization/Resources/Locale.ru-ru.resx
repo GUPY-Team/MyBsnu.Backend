@@ -50,4 +50,7 @@
     <data name="errors.InvalidClaims" xml:space="preserve">
         <value>Разрешения {0} не существуют</value>
     </data>
+    <data name="errors.CascadeDeleteRestricted" xml:space="preserve">
+        <value>Невозможно удалить: {0}. Удаление приведет к каскадным изменениям.</value>
+    </data>
 </root>

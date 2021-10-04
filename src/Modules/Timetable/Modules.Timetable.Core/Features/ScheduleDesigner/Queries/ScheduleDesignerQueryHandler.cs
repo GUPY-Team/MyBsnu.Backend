@@ -36,12 +36,11 @@ namespace Modules.Timetable.Core.Features.ScheduleDesigner.Queries
 
             var busyTeachers = _dbContext.Classes
                 .WithSpecification(new ScheduleClassesAtPeriodSpecification(request.ScheduleId, startTime, weekDay, weekType))
-                .SelectMany(c => c.Teachers)
-                .Select(t => t.Id);
+                .SelectMany(c => c.Teachers);
 
             var idleTeachers = await _dbContext.Teachers
                 .AsNoTracking()
-                .Where(t => !busyTeachers.Contains(t.Id))
+                .Where(t => !busyTeachers.Contains(t))
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<TeacherDto>>(idleTeachers);
@@ -55,12 +54,11 @@ namespace Modules.Timetable.Core.Features.ScheduleDesigner.Queries
 
             var busyAudiences = _dbContext.Classes
                 .WithSpecification(new ScheduleClassesAtPeriodSpecification(request.ScheduleId, startTime, weekDay, weekType))
-                .SelectMany(c => c.Audiences)
-                .Select(a => a.Id);
+                .SelectMany(c => c.Audiences);
 
             var idleAudiences = await _dbContext.Audiences
                 .AsNoTracking()
-                .Where(a => !busyAudiences.Contains(a.Id))
+                .Where(a => !busyAudiences.Contains(a))
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<AudienceDto>>(idleAudiences);
@@ -74,12 +72,11 @@ namespace Modules.Timetable.Core.Features.ScheduleDesigner.Queries
 
             var busyGroups = _dbContext.Classes
                 .WithSpecification(new ScheduleClassesAtPeriodSpecification(request.ScheduleId, startTime, weekDay, weekType))
-                .SelectMany(c => c.Groups)
-                .Select(g => g.Id);
+                .SelectMany(c => c.Groups);
 
             var idleGroups = await _dbContext.Groups
                 .AsNoTracking()
-                .Where(g => !busyGroups.Contains(g.Id))
+                .Where(g => !busyGroups.Contains(g))
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<GroupDto>>(idleGroups);

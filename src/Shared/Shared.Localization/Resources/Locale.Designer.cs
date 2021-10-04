@@ -70,6 +70,15 @@ namespace Shared.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t delete: {0}. Deleting entity will cause cascade deletes.
+        /// </summary>
+        internal static string errors_CascadeDeleteRestricted {
+            get {
+                return ResourceManager.GetString("errors.CascadeDeleteRestricted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t  delete a published schedule.
         /// </summary>
         internal static string errors_DeletePublishedSchedule {

@@ -29,4 +29,13 @@ namespace Shared.Core.Domain
             EntityName = entityName;
         }
     }
+
+    public class EntityCascadeDeleteRestricted : DomainException
+    {
+        public string EntityName { get; }
+        public EntityCascadeDeleteRestricted(string entityName) : base($"Can't cascade delete {entityName}")
+        {
+            EntityName = entityName;
+        }
+    }
 }

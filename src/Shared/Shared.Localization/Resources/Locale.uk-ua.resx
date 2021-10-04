@@ -50,4 +50,7 @@
     <data name="errors.InvalidClaims" xml:space="preserve">
         <value>Дозволи {0} не існують</value>
     </data>
+    <data name="errors.CascadeDeleteRestricted" xml:space="preserve">
+        <value>Неможилво видалити: {0}. Видалення призведе до каскадних змін.</value>
+    </data>
 </root>

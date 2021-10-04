@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
 using Modules.Timetable.Core.Entities;
 using Shared.Core.Domain;
@@ -49,6 +50,12 @@ namespace Modules.Timetable.Core.Features.Groups.Commands
         {
             var group = await _dbContext.Groups.FindAsync(request.Id);
             Guard.RequireEntityNotNull(group);
+
+            var groupInUse = await _dbContext.Classes.AnyAsync(c => c.Groups.Contains(group), cancellationToken);
+            if (groupInUse)
+            {
+                throw new EntityCascadeDeleteRestricted(nameof(Group));
+            }
 
             _dbContext.Groups.Remove(group);
             await _dbContext.SaveChangesAsync(cancellationToken);
