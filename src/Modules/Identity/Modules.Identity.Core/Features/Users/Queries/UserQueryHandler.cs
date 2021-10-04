@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.Specification.EntityFrameworkCore;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -50,6 +49,7 @@ namespace Modules.Identity.Core.Features.Users.Queries
         {
             var users = await _userManager.Users
                 .AsNoTracking()
+                .OrderBy(u => u.Id)
                 .Paginate(request.Page, request.PageSize)
                 .ToListAsync(cancellationToken);
             var totalCount = await _userManager.Users.CountAsync(cancellationToken);

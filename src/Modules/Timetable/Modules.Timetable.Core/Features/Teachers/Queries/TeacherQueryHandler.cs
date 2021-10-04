@@ -6,8 +6,6 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
-using Modules.Timetable.Core.Entities;
-using Shared.Core.Domain;
 using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 

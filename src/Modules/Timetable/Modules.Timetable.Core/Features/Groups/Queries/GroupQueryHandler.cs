@@ -36,7 +36,10 @@ namespace Modules.Timetable.Core.Features.Groups.Queries
 
         public async Task<List<GroupDto>> Handle(GetGroupsQuery request, CancellationToken cancellationToken)
         {
-            var groups = await _dbContext.Groups.AsNoTracking().OrderBy(g => g.Number).ToListAsync(cancellationToken);
+            var groups = await _dbContext.Groups
+                .AsNoTracking()
+                .OrderBy(g => g.Number)
+                .ToListAsync(cancellationToken);
             return _mapper.Map<List<GroupDto>>(groups);
         }
     }

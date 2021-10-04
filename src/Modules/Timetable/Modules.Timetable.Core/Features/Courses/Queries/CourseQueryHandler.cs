@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
-using Modules.Timetable.Core.Entities;
-using Shared.Core.Domain;
 using Shared.Core.Helpers;
 using Shared.DTO.Schedule;
 
@@ -35,7 +34,10 @@ namespace Modules.Timetable.Core.Features.Courses.Queries
 
         public async Task<List<CourseDto>> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
         {
-            var courses = await _dbContext.Courses.AsNoTracking().ToListAsync(cancellationToken);
+            var courses = await _dbContext.Courses
+                .AsNoTracking()
+                .OrderBy(q => q.Id)
+                .ToListAsync(cancellationToken);
             return _mapper.Map<List<CourseDto>>(courses);
         }
     }
