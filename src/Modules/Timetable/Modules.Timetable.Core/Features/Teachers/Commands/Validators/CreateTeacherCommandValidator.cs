@@ -8,7 +8,7 @@ namespace Modules.Timetable.Core.Features.Teachers.Commands.Validators
         {
             RuleFor(c => c.FirstName).NotEmpty().MaximumLength(256);
             RuleFor(c => c.LastName).NotEmpty().MaximumLength(256);
-            RuleFor(c => c.Patronymic).NotEmpty().MaximumLength(256);
+            RuleFor(c => c.ThirdName).NotEmpty().MaximumLength(256);
         }
     }
 }

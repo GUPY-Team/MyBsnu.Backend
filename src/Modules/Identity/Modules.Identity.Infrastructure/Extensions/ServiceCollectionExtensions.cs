@@ -79,7 +79,6 @@ namespace Modules.Identity.Infrastructure.Extensions
                     o.SaveToken = true;
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
                         ValidateIssuer = false,
                         ValidateAudience = false,

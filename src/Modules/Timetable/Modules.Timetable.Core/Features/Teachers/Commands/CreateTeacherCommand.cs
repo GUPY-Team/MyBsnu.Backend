@@ -7,6 +7,6 @@ namespace Modules.Timetable.Core.Features.Teachers.Commands
     {
         public string FirstName { get; init; }
         public string LastName { get; init; }
-        public string Patronymic { get; init; }
+        public string ThirdName { get; init; }
     }
 }
