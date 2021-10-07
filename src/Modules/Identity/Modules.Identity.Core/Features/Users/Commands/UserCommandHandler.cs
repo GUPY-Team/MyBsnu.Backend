@@ -45,7 +45,8 @@ namespace Modules.Identity.Core.Features.Users.Commands
             await _userManager.AddClaimsAsync(user, new[]
             {
                 new Claim("email", user.Email),
-                new Claim("userName", user.UserName)
+                new Claim("userName", user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             });
             
             return Unit.Value;
@@ -79,7 +80,7 @@ namespace Modules.Identity.Core.Features.Users.Commands
             Guard.RequireEntityNotNull(user);
 
             var claims = (await _userManager.GetClaimsAsync(user))
-                .Where(c => c.Type == Permissions.PermissionsClaimType);
+                .Where(c => c.Type == Permissions.PermissionClaimType);
 
             var result = await _userManager.RemoveClaimsAsync(user, claims);
             if (!result.Succeeded)

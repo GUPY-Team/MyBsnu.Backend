@@ -5,20 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Groups.Commands;
 using Modules.Timetable.Core.Features.Groups.Queries;
 using Shared.Core.Constants;
+using Shared.Core.Models;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
-    [Authorize(Policy = Permissions.CanManageGroups)]
+    [Authorize(Policy = Permissions.ScheduleEditor)]
     public class GroupsController : ApiControllerBase
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<GroupDto>>> GetGroups()
+        public async Task<ActionResult<PagedList<GroupDto>>> GetGroups([FromQuery] GetGroupsQuery query)
         {
-            var result = await Mediator.Send(new GetGroupsQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 

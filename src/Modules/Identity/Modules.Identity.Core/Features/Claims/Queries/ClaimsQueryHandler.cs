@@ -14,7 +14,7 @@ namespace Modules.Identity.Core.Features.Claims.Queries
         {
             var claims = Permissions.All.Select(c => new ClaimDto
             {
-                Type = Permissions.PermissionsClaimType,
+                Type = Permissions.PermissionClaimType,
                 Value = c.Replace($"{Permissions.PermissionsPrefix}.", "")
             }).ToList();
 

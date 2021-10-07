@@ -133,6 +133,15 @@ namespace Shared.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid values for pagination.
+        /// </summary>
+        internal static string errors_InvalidPagination {
+            get {
+                return ResourceManager.GetString("errors.InvalidPagination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entity {0} not found.
         /// </summary>
         internal static string errors_NotFound {

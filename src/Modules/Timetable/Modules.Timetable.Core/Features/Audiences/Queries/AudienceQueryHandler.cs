@@ -6,14 +6,16 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Modules.Timetable.Core.Abstractions;
+using Shared.Core.Extensions;
 using Shared.Core.Helpers;
+using Shared.Core.Models;
 using Shared.DTO.Schedule;
 
 namespace Modules.Timetable.Core.Features.Audiences.Queries
 {
     public class AudienceQueryHandler
         : IRequestHandler<GetAudienceByIdQuery, AudienceDto>,
-            IRequestHandler<GetAudiencesQuery, List<AudienceDto>>
+            IRequestHandler<GetAudiencesQuery, PagedList<AudienceDto>>
     {
         private readonly IScheduleDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -32,15 +34,19 @@ namespace Modules.Timetable.Core.Features.Audiences.Queries
             return _mapper.Map<AudienceDto>(audience);
         }
 
-        public async Task<List<AudienceDto>> Handle(GetAudiencesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedList<AudienceDto>> Handle(GetAudiencesQuery request, CancellationToken cancellationToken)
         {
             var audiences = await _dbContext.Audiences
+                .AsNoTracking()
                 .OrderBy(a => a.Corps)
                 .ThenBy(a => a.Floor)
                 .ThenBy(a => a.Room)
-                .AsNoTracking()
+                .Paginate(request.Page, request.PageSize)
                 .ToListAsync(cancellationToken);
-            return _mapper.Map<List<AudienceDto>>(audiences);
+            var totalCount = await _dbContext.Audiences.CountAsync(cancellationToken);
+            
+            var mappedItems = _mapper.Map<List<AudienceDto>>(audiences);
+            return new PagedList<AudienceDto>(mappedItems, request.Page, request.PageSize, totalCount);
         }
     }
 }

@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Courses.Commands;
 using Modules.Timetable.Core.Features.Courses.Queries;
 using Shared.Core.Constants;
+using Shared.Core.Models;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
-    [Authorize(Policy = Permissions.CanManageCourses)]
+    [Authorize(Policy = Permissions.ScheduleEditor)]
     public class CoursesController : ApiControllerBase
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<CourseDto>>> GetCourses()
+        public async Task<ActionResult<PagedList<CourseDto>>> GetCourses([FromQuery] GetCoursesQuery query)
         {
-            var result = await Mediator.Send(new GetCoursesQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 

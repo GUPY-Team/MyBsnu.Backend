@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Shared.DTO
+namespace Shared.Core.Models
 {
     public class PagedList<T>
     {

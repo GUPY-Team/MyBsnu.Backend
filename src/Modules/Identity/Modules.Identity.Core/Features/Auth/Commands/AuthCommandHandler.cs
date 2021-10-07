@@ -71,7 +71,8 @@ namespace Modules.Identity.Core.Features.Auth.Commands
             await _userManager.AddClaimsAsync(user, new[]
             {
                 new Claim("email", user.Email),
-                new Claim("userName", user.UserName)
+                new Claim("userName", user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             });
 
             if (!result.Succeeded)

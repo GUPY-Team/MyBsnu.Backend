@@ -11,7 +11,7 @@ namespace Shared.Infrastructure.Mappings
         {
             CreateMap<TimeDto, TimeSpan>().ConvertUsing(t => t.AsTimeSpan());
             CreateMap<TimeSpan, TimeDto>();
-            CreateMap<TimeSpan, string>().ConvertUsing(t => t.ToString(FormattingConstants.TimeSpan));
+            CreateMap<TimeSpan, string>().ConvertUsing(t => t.ToString(CommonConstants.Formatting.TimeSpan));
         }
     }
 }

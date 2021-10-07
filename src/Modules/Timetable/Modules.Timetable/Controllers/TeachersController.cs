@@ -5,20 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Teachers.Commands;
 using Modules.Timetable.Core.Features.Teachers.Queries;
 using Shared.Core.Constants;
+using Shared.Core.Models;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
-    [Authorize(Policy = Permissions.CanManageTeachers)]
+    [Authorize(Policy = Permissions.ScheduleEditor)]
     public class TeachersController : ApiControllerBase
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<TeacherDto>>> GetTeachers()
+        public async Task<ActionResult<PagedList<TeacherDto>>> GetTeachers([FromQuery] GetTeachersQuery query)
         {
-            var result = await Mediator.Send(new GetTeachersQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 

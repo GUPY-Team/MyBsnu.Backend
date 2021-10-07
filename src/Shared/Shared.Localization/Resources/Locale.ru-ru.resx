@@ -53,4 +53,7 @@
     <data name="errors.CascadeDeleteRestricted" xml:space="preserve">
         <value>Невозможно удалить: {0}. Удаление приведет к каскадным изменениям.</value>
     </data>
+    <data name="errors.InvalidPagination" xml:space="preserve">
+        <value>Невалидные значения для пейджинации</value>
+    </data>
 </root>

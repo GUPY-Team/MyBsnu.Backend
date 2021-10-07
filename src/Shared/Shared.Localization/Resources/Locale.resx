@@ -60,4 +60,7 @@
     <data name="errors.CascadeDeleteRestricted" xml:space="preserve">
         <value>Can't delete: {0}. Deleting entity will cause cascade deletes</value>
     </data>
+    <data name="errors.InvalidPagination" xml:space="preserve">
+        <value>Invalid values for pagination</value>
+    </data>
 </root>

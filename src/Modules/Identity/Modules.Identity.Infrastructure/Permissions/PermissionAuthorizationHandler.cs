@@ -10,7 +10,7 @@ namespace Modules.Identity.Infrastructure.Permissions
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
             var policySatisfied = context.User.Claims
-                .Where(c => c.Type == PermissionConstants.PermissionsClaimType)
+                .Where(c => c.Type == PermissionConstants.PermissionClaimType)
                 .Select(c => $"{PermissionConstants.PermissionsPrefix}.{c.Value}")
                 .Any(value => value == requirement.Permission || value == PermissionConstants.SuperAdmin);
 

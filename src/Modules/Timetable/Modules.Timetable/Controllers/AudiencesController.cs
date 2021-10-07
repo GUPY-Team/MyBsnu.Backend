@@ -5,20 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Timetable.Core.Features.Audiences.Commands;
 using Modules.Timetable.Core.Features.Audiences.Queries;
 using Shared.Core.Constants;
+using Shared.Core.Models;
 using Shared.DTO.Schedule;
 using Shared.Infrastructure.Controllers;
 
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
-    [Authorize(Policy = Permissions.CanManageAudiences)]
+    [Authorize(Policy = Permissions.ScheduleEditor)]
     public class AudiencesController : ApiControllerBase
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<List<AudienceDto>>> GetAudiences()
+        public async Task<ActionResult<PagedList<AudienceDto>>> GetAudiences([FromQuery] GetAudiencesQuery query)
         {
-            var result = await Mediator.Send(new GetAudiencesQuery());
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 

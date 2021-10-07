@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Identity.Core.Features.Users.Commands;
 using Modules.Identity.Core.Features.Users.Queries;
 using Shared.Core.Constants;
+using Shared.Core.Models;
 using Shared.DTO;
 using Shared.DTO.Identity;
 using Shared.Infrastructure.Controllers;

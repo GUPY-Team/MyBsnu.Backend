@@ -11,6 +11,7 @@ using Modules.Timetable.Core.Entities;
 using Modules.Timetable.Core.Specifications;
 using Shared.Core.Extensions;
 using Shared.Core.Helpers;
+using Shared.Core.Models;
 using Shared.DTO;
 using Shared.DTO.Schedule;
 

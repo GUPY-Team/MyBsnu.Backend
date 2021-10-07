@@ -8,16 +8,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Shared.Core.Behaviors;
+using Shared.Core.Interfaces;
+using Shared.Infrastructure.Implementations;
 using Shared.Infrastructure.Middleware;
 
 namespace Shared.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSharedServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+        public static IServiceCollection AddSharedServices(this IServiceCollection services,
+            IConfiguration configuration, IHostEnvironment environment)
         {
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
-            
+
             services.AddLogging();
 
             services.AddApiVersioning(o =>
@@ -42,19 +45,17 @@ namespace Shared.Infrastructure.Extensions
             services.AddCorsPolicy();
 
             services.AddMemoryCache();
-            
+
             services.RegisterServices();
 
             return services;
         }
 
-        public static IServiceCollection AddDatabaseContext<T>(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDatabaseContext<T>(this IServiceCollection services,
+            IConfiguration configuration)
             where T : DbContext
         {
-            services.AddDbContext<T>(o =>
-            {
-                o.UseNpgsql(configuration.GetConnectionString("postgres"));
-            });
+            services.AddDbContext<T>(o => { o.UseNpgsql(configuration.GetConnectionString("postgres")); });
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<T>();
@@ -98,13 +99,26 @@ namespace Shared.Infrastructure.Extensions
 
         private static void AddCorsPolicy(this IServiceCollection services)
         {
-            services.AddCors(o => { o.AddDefaultPolicy(pb => { pb.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); }); });
+            services.AddCors(o =>
+            {
+                o.AddDefaultPolicy(pb => { pb.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); });
+            });
         }
 
         private static void RegisterServices(this IServiceCollection services)
         {
             services.AddTransient<ExceptionHandlerMiddleware>();
+
+            services.AddCurrentUser();
+
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
-        } 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PagedQueryBehavior<,>));
+        }
+
+        private static void AddCurrentUser(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+        }
     }
 }

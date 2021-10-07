@@ -10,7 +10,7 @@ using Shared.Infrastructure.Controllers;
 namespace Modules.Timetable.Controllers
 {
     [ApiVersion("1.0")]
-    [Authorize(Policy = Permissions.CanManageClasses)]
+    [Authorize(Policy = Permissions.ScheduleEditor)]
     public class ClassesController : ApiControllerBase
     {
         [HttpGet("{Id:min(1)}")]

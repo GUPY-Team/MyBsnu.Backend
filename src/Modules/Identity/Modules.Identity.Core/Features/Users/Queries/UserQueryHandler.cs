@@ -10,6 +10,7 @@ using Modules.Identity.Core.Entities;
 using Shared.Core.Constants;
 using Shared.Core.Extensions;
 using Shared.Core.Helpers;
+using Shared.Core.Models;
 using Shared.DTO;
 using Shared.DTO.Identity;
 
@@ -34,7 +35,7 @@ namespace Modules.Identity.Core.Features.Users.Queries
             Guard.RequireEntityNotNull(user);
 
             var userClaims = (await _userManager.GetClaimsAsync(user))
-                .Where(c => c.Type == Permissions.PermissionsClaimType);
+                .Where(c => c.Type == Permissions.PermissionClaimType);
 
             return new AppUserDto
             {
