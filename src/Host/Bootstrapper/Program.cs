@@ -14,7 +14,7 @@ namespace Bootstrapper
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json")
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)
                 .Build();
 
 

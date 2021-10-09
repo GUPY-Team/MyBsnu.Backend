@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api.dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      ConnectionStrings__postgres: "Host=db;Username=postgres;Password=postgres;Database=my_bsnu"
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    restart: on-failure
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "my_bsnu"
+
+volumes:
+  db_volume:

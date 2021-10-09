@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Shared.Infrastructure.Middleware;
 
@@ -7,13 +9,22 @@ namespace Shared.Infrastructure.Extensions
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseSharedMiddleware(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSharedMiddleware(
+            this IApplicationBuilder app,
+            IHostEnvironment environment)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                   ForwardedHeaders.XForwardedProto |
+                                   ForwardedHeaders.XForwardedHost
+            });
+
             app.UseSerilogRequestLogging();
 
             app.UseRequestLocalization(o =>
             {
-                var supportedCultures = new[] { "uk-UA", "en-US", "ru-RU" };
+                var supportedCultures = new[] {"uk-UA", "en-US", "ru-RU"};
 
                 o.SetDefaultCulture(supportedCultures[0]);
                 o.AddSupportedCultures(supportedCultures);
@@ -38,12 +49,15 @@ namespace Shared.Infrastructure.Extensions
                 endpoints.MapControllers();
             });
 
-            app.UseSwagger();
-            app.UseSwaggerUI(o =>
+            if (environment.IsDevelopment())
             {
-                o.RoutePrefix = "swagger";
-                o.DisplayRequestDuration();
-            });
+                app.UseSwagger();
+                app.UseSwaggerUI(o =>
+                {
+                    o.RoutePrefix = "swagger";
+                    o.DisplayRequestDuration();
+                });
+            }
 
             return app;
         }

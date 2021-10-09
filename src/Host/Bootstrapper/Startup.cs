@@ -1,12 +1,9 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Identity.Extensions;
 using Modules.Timetable.Extensions;
-using Shared.Core.Interfaces;
 using Shared.Infrastructure.Extensions;
 
 namespace Bootstrapper
@@ -32,7 +29,7 @@ namespace Bootstrapper
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseSharedMiddleware();
+            app.UseSharedMiddleware(WebHostEnvironment);
         }
     }
 }

@@ -34,6 +34,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Timetable", "src\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Localization", "src\Shared\Shared.Localization\Shared.Localization.csproj", "{C63C74DD-F084-4848-B196-26683FE55497}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AB61F146-F1E3-4E88-8193-FEB6451CF9E8}"
+ProjectSection(SolutionItems) = preProject
+	api.dockerfile = api.dockerfile
+	.dockerignore = .dockerignore
+	.gitignore = .gitignore
+	docker-compose.local.yml = docker-compose.local.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -16,8 +16,10 @@ namespace Shared.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSharedServices(this IServiceCollection services,
-            IConfiguration configuration, IHostEnvironment environment)
+        public static IServiceCollection AddSharedServices(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            IHostEnvironment environment)
         {
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
 
