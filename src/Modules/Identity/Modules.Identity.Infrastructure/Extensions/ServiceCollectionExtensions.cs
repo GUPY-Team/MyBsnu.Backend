@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Entities;
 using Modules.Identity.Core.Settings;
+using Modules.Identity.Infrastructure.BackgroundServices;
 using Modules.Identity.Infrastructure.Permissions;
 using Modules.Identity.Infrastructure.Services;
 using Shared.Infrastructure.Extensions;
@@ -44,6 +45,8 @@ namespace Modules.Identity.Infrastructure.Extensions
                 .AddDefaultTokenProviders();
 
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+            services.AddHostedService<UserSeedService>();
 
             services.AddPermissions();
             services.AddJwtAuth(configuration, environment);
