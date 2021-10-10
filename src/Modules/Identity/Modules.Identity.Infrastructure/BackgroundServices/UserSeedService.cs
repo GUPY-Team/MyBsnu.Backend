@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Modules.Identity.Core.Entities;
+using Permission = Shared.Core.Constants.Permissions;
 
 namespace Modules.Identity.Infrastructure.BackgroundServices
 {
@@ -40,13 +42,19 @@ namespace Modules.Identity.Infrastructure.BackgroundServices
             };
 
             var result = await userManager.CreateAsync(user, "P@assword#12345");
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return;
+                var errors = result.Errors.Select(e => $"{e.Code}: {e.Description}");
+                _logger.LogError("Can't create default admin user. Errors: {0}", string.Join('\n', errors));
             }
-
-            var errors = result.Errors.Select(e => $"{e.Code}: {e.Description}");
-            _logger.LogError("Can't create default admin user. Errors: {0}", string.Join('\n', errors));
+            
+            await userManager.AddClaimsAsync(user, new[]
+            {
+                new Claim("email", user.Email),
+                new Claim("userName", user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(Permission.PermissionClaimType, Permission.SuperAdmin)
+            });
         }
     }
 }

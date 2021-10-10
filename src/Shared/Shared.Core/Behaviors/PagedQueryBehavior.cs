@@ -56,7 +56,7 @@ namespace Shared.Core.Behaviors
 
             if (_currentUser.Id == null && request.PageSize >= CommonConstants.Pagination.DefaultMaxPageSize)
             {
-                throw new EntityNotFoundException(_localizer.GetString("errors.InvalidPagination"));
+                throw new EntityNotValidException(_localizer.GetString("errors.InvalidPagination"));
             }
 
             return await next();
