@@ -54,7 +54,7 @@ namespace Shared.Core.Behaviors
                 throw new EntityNotValidException(_localizer.GetString("errors.InvalidPagination"), errors);
             }
 
-            if (_currentUser.Id == null && request.PageSize >= CommonConstants.Pagination.DefaultMaxPageSize)
+            if (_currentUser.Id == null && request.PageSize > CommonConstants.Pagination.DefaultMaxPageSize)
             {
                 throw new EntityNotValidException(_localizer.GetString("errors.InvalidPagination"));
             }
