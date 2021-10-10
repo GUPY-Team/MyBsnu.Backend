@@ -39,7 +39,7 @@ namespace Modules.Identity.Infrastructure.BackgroundServices
                 UserName = "Lain"
             };
 
-            var result = await userManager.CreateAsync(user, "12345678");
+            var result = await userManager.CreateAsync(user, "P@assword#12345");
             if (result.Succeeded)
             {
                 return;

@@ -39,7 +39,7 @@ ProjectSection(SolutionItems) = preProject
 	api.dockerfile = api.dockerfile
 	.dockerignore = .dockerignore
 	.gitignore = .gitignore
-	docker-compose.local.yml = docker-compose.local.yml
+	docker-compose.yml = docker-compose.yml
 	db.dockerfile = db.dockerfile
 EndProjectSection
 EndProject
