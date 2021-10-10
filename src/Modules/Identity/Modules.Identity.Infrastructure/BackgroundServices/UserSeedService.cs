@@ -53,7 +53,8 @@ namespace Modules.Identity.Infrastructure.BackgroundServices
                 new Claim("email", user.Email),
                 new Claim("userName", user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(Permission.PermissionClaimType, Permission.SuperAdmin)
+                new Claim(Permission.PermissionClaimType,
+                    Permission.SuperAdmin.Replace($"{Permission.PermissionsPrefix}.", ""))
             });
         }
     }
