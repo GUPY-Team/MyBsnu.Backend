@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +11,7 @@ namespace Bootstrapper
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false)
@@ -34,7 +35,7 @@ namespace Bootstrapper
                 var host = CreateHostBuilder(args).Build();
 
                 Log.Information("Starting host...");
-                host.Run();
+                await host.RunWithTasksAsync();
             }
             catch (Exception ex)
             {

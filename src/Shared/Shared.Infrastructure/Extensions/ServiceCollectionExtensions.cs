@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using Shared.Core.Behaviors;
 using Shared.Core.Interfaces;
 using Shared.Infrastructure.Implementations;
+using Shared.Infrastructure.Interfaces;
 using Shared.Infrastructure.Middleware;
 
 namespace Shared.Infrastructure.Extensions
@@ -122,5 +123,9 @@ namespace Shared.Infrastructure.Extensions
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
         }
+
+        public static IServiceCollection AddStartupTask<T>(this IServiceCollection services)
+            where T : class, IStartupTask
+            => services.AddTransient<IStartupTask, T>();
     }
 }

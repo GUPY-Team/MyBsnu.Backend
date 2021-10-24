@@ -5,25 +5,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Modules.Identity.Core.Entities;
+using Shared.Infrastructure.Interfaces;
 using Permission = Shared.Core.Constants.Permissions;
 
-namespace Modules.Identity.Infrastructure.BackgroundServices
+namespace Modules.Identity.Infrastructure.StartupTasks
 {
-    public class UserSeedService : BackgroundService
+    public class SeedUsersStartupTask : IStartupTask
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<UserSeedService> _logger;
+        private readonly ILogger<SeedUsersStartupTask> _logger;
 
-        public UserSeedService(IServiceProvider serviceProvider, ILogger<UserSeedService> logger)
+        public SeedUsersStartupTask(IServiceProvider serviceProvider, ILogger<SeedUsersStartupTask> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
 

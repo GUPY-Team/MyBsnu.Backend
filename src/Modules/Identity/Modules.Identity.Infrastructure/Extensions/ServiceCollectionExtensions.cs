@@ -2,7 +2,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,9 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Modules.Identity.Core.Abstractions;
 using Modules.Identity.Core.Entities;
 using Modules.Identity.Core.Settings;
-using Modules.Identity.Infrastructure.BackgroundServices;
 using Modules.Identity.Infrastructure.Permissions;
 using Modules.Identity.Infrastructure.Services;
+using Modules.Identity.Infrastructure.StartupTasks;
 using Shared.Infrastructure.Extensions;
 using IdentityDbContext = Modules.Identity.Infrastructure.Persistence.IdentityDbContext;
 
@@ -46,7 +45,7 @@ namespace Modules.Identity.Infrastructure.Extensions
 
             services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-            services.AddHostedService<UserSeedService>();
+            services.AddStartupTask<SeedUsersStartupTask>();
 
             services.AddPermissions();
             services.AddJwtAuth(configuration, environment);
